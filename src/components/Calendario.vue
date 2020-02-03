@@ -1,10 +1,9 @@
+/* eslint-disable vue/attribute-hyphenation */
 <template>
   <v-row class="fill-height">
     <v-col>
+      <!-- {{ teste }} -->
       <v-sheet height="64">
-        <div>
-          {{ teste }}
-        </div>
         <v-toolbar flat color="white">
           <v-btn outlined class="mr-4" color="grey darken-2" @click="setToday">
             Today
@@ -54,13 +53,11 @@
           :event-color="getEventColor"
           :now="today"
           :type="type"
-          @click:day="createEvent"
-          @click:event="showEvent"
+          @click:day="openFormCriar"
+          @click:event="openFormEditar"
           @click:more="viewDay"
           @click:date="viewDay"
-          @change="updateRange"
-        ><template #day-month><div class="day-month">day-month</div></template></v-calendar>
-
+        />
         <v-menu
           v-model="selectedOpen"
           :close-on-content-click="false"
@@ -102,14 +99,25 @@
             </v-card-actions>
           </v-card>
         </v-menu>
+        <app-form :open="open" :data="data" :nome="nome" :inicio="inicio" :fim="fim" @openChanged="limparDados()" @dadosEvento="open=false; teste=$event; criarEvento(teste)" />
       </v-sheet>
     </v-col>
   </v-row>
 </template>
 
 <script>
+import ReuniaoForm from './Reuniao.vue'
+
 export default {
+  components: {
+    appForm: ReuniaoForm
+  },
   data: () => ({
+    fim: null,
+    inicio: null,
+    nome: '',
+    data: '',
+    open: false,
     teste: 'teste',
     focus: '',
     type: 'month',
@@ -171,10 +179,37 @@ export default {
       this.focus = date
       this.type = 'day'
     },
-    createEvent({ day }){
-      this.teste = day
+    openFormCriar({ date}){
+      this.data = date
+      this.open=true
+    },
+    openFormEditar({ date, event }){
+      this.data = date
+      this.inicio= event.start.split(' ')[1]
+      this.fim = event.end.split(' ')[1]
+      this.nome = event.name
+    },
+    limparDados(){
+      this.nome=''
+      this.fim=null
+      this.inicio=null
+      this.sala=''
+      this.data=''
+      this.open = false
+    },
+    criarEvento(teste){
       // eslint-disable-next-line no-console
-      console.log(day)
+      console.log(teste)
+
+      const events = []
+
+      this.events.push({
+        name: this.teste.nome,
+        start: this.teste.inicio,
+        end: this.teste.fim,
+        color: this.colors[this.rnd(0, this.colors.length - 1)],
+      })
+
     },
     getEventColor (event) {
       return event.color
