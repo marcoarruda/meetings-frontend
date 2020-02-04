@@ -1,7 +1,7 @@
 <template>
   <v-row justify="center">
     <v-dialog v-model="open" persistent max-width="600px">
-      <v-form v-model="form.valid">
+      <v-form ref="form" v-model="form.valid">
         <v-card color="grey lighten-4" min-width="350px">
           <v-toolbar color="blue">
             <v-toolbar-title>Reservar Sala</v-toolbar-title>
@@ -11,7 +11,7 @@
             <v-container>
               <v-row>
                 <v-col cols="12" sm="6">
-                  <v-text-field v-model="nome" label="Nome" />
+                  <v-text-field v-model="formData.nome" label="Nome" />
                 </v-col>
                 <v-col cols="12" sm="6">
                   <v-select
@@ -25,7 +25,7 @@
               <v-row>
                 <v-col cols="12" sm="6" md="4">
                   <v-menu
-                    v-model="menuDataI"
+                    v-model="formData.menuDataI"
                     :close-on-content-click="false"
                     :nudge-right="40"
                     transition="scale-transition"
@@ -34,19 +34,19 @@
                   >
                     <template v-slot:activator="{ on }">
                       <v-text-field
-                        v-model="dataI"
+                        v-model="formData.dataI"
                         label="Data inicio"
                         :rules="[...form.rules.ruleNotEmpty, ...ruleFimData]"
                         readonly
                         v-on="on"
                       />
                     </template>
-                    <v-date-picker v-model="dataI" @input="menuDataI = false" />
+                    <v-date-picker v-model="formData.dataI" @input="formData.menuDataI = false" />
                   </v-menu>
                 </v-col>
                 <v-col cols="12" sm="6" md="4">
                   <v-menu
-                    v-model="menuDataF"
+                    v-model="formData.menuDataF"
                     :close-on-content-click="false"
                     :nudge-right="40"
                     transition="scale-transition"
@@ -55,14 +55,14 @@
                   >
                     <template v-slot:activator="{ on }">
                       <v-text-field
-                        v-model="dataF"
+                        v-model="formData.dataF"
                         label="Data fim"
                         :rules="[...form.rules.ruleNotEmpty, ...ruleFimData]"
                         readonly
                         v-on="on"
                       />
                     </template>
-                    <v-date-picker v-model="dataF" @input="menuDataF = false" />
+                    <v-date-picker v-model="formData.dataF" @input="formData.menuDataF = false" />
                   </v-menu>
                 </v-col>
               </v-row>
@@ -73,7 +73,7 @@
                     v-model="menu2"
                     :close-on-content-click="false"
                     :nudge-right="40"
-                    :return-value.sync="inicio"
+                    :return-value.sync="formData.inicio"
                     transition="scale-transition"
                     offset-y
                     max-width="290px"
@@ -81,7 +81,7 @@
                   >
                     <template v-slot:activator="{ on }">
                       <v-text-field
-                        v-model="inicio"
+                        v-model="formData.inicio"
                         label="Inicio"
                         :rules="[...form.rules.ruleNotEmpty, ...ruleFimData]"
                         readonly
@@ -90,9 +90,9 @@
                     </template>
                     <v-time-picker
                       v-if="menu2"
-                      v-model="inicio"
+                      v-model="formData.inicio"
                       full-width
-                      @click:minute="$refs.menu.save(inicio)"
+                      @click:minute="$refs.menu.save(formData.inicio)"
                     />
                   </v-menu>
                 </v-col>
@@ -102,7 +102,7 @@
                     v-model="modal2"
                     :close-on-content-click="false"
                     :nudge-right="40"
-                    :return-value.sync="fim"
+                    :return-value.sync="formData.fim"
                     transition="scale-transition"
                     offset-y
                     max-width="290px"
@@ -110,7 +110,7 @@
                   >
                     <template v-slot:activator="{ on }">
                       <v-text-field
-                        v-model="fim"
+                        v-model="formData.fim"
                         label="Fim"
                         :rules="[...form.rules.ruleNotEmpty, ...ruleFimData]"
                         readonly
@@ -119,9 +119,9 @@
                     </template>
                     <v-time-picker
                       v-if="modal2"
-                      v-model="fim"
+                      v-model="formData.fim"
                       full-width
-                      @click:minute="$refs.menu2.save(fim)"
+                      @click:minute="$refs.menu2.save(formData.fim)"
                     />
                   </v-menu>
                 </v-col>
@@ -138,40 +138,80 @@
   </v-row>
 </template>
 <script>
+import Vue from 'vue'
+
 export default {
-  props: ['open', 'data', 'inicio', 'fim', 'nome', 'op'],
-  data: () => ({
-    dataI: new Date().toISOString().substr(0, 10),
-    menuDataI: false,
-    dataF: new Date().toISOString().substr(0, 10),
-    menuDataF: false,
-    form: {
-      valid: false,
-      rules: {
-        ruleSelect: [v => !!v || 'Selecione um dos itens abaixo'],
-        ruleNotEmpty: [v => !!v || 'Campo não pode ser vazio'],
-      }
-    },
-    sala: '',
-    menu2: false,
-    modal2: false
-  }),
+  props: ['open', 'data', 'evento'],
+  data() {
+    return {
+      formData: {
+        id:'',
+        inicio: null,
+        fim: null,
+        nome: '',
+        dataI:null,
+        menuDataI: false,
+        dataF: null,
+        menuDataF: false
+      },
+      form: {
+        valid: false,
+        rules: {
+          ruleSelect: [v => !!v || 'Selecione um dos itens abaixo'],
+          ruleNotEmpty: [v => !!v || 'Campo não pode ser vazio']
+        }
+      },
+      sala: '',
+      menu2: false,
+      modal2: false
+    }
+  },
   computed: {
     ruleFimData() {
       // eslint-disable-next-line no-console
-      console.log(new Date(this.dataI+' '+this.inicio).getTime())
+      // console.log(new Date(this.formData.dataI + ' ' + this.inicio).getTime())
       // eslint-disable-next-line no-console
-      console.log(new Date(this.dataF+' '+this.fim).getTime())
+      // console.log(new Date(this.formData.dataF + ' ' + this.fim).getTime())
       return [
-        v => (new Date(this.dataI+' '+this.inicio).getTime() < new Date(this.dataF+' '+this.fim).getTime()) || 'Inicio deve ser menor que fim'
+        v =>
+          new Date(this.formData.dataI + ' ' + this.formData.inicio).getTime() <
+            new Date(this.formData.dataF + ' ' + this.formData.fim).getTime() ||
+          'Inicio deve ser menor que fim'
       ]
+    }
+  },
+  watch:{
+    data: function(){
+      if(this.data != ''){
+        this.formData.dataI = this.data
+        this.formData.dataF = this.data
+      }
+    },
+    evento: function(){
+      if(this.evento != ''){
+        this.formData.id = this.evento.id
+        this.formData.inicio = this.evento.inicio
+        this.formData.fim = this.evento.fim
+        this.formData.dataI = this.evento.dataI
+        this.formData.dataF = this.evento.dataF
+        this.formData.nome = this.evento.nome
+      }
+    },
+    formData:{
+      deep: true,
+      handler(to, from) {
+        // eslint-disable-next-line no-console
+        // console.log(to)
+        this.$refs.form.validate()
+      }
     }
   },
   methods: {
     openChanged() {
-      this.nome = ''
-      this.fim = null
-      this.inicio = null
+      this.formData.id = ''
+      this.formData.nome = ''
+      this.formData.fim = null
+      this.formData.inicio = null
       this.sala = ''
       this.data = ''
       this.open = false
@@ -179,14 +219,16 @@ export default {
     },
     dadosEvento() {
       let evento = {
-        nome: this.nome,
-        inicio: this.data + ' ' + this.inicio,
-        fim: this.data + ' ' + this.fim,
+        id: this.formData.id,
+        nome: this.formData.nome,
+        inicio: this.formData.dataI + ' ' + this.formData.inicio,
+        fim: this.formData.dataI + ' ' + this.formData.fim,
         sala: this.sala
       }
-      this.nome = ''
-      this.fim = null
-      this.inicio = null
+      this.formData.id=''
+      this.formData.nome = ''
+      this.formData.fim = null
+      this.formData.inicio = null
       this.sala = ''
       this.data = ''
       this.open = false

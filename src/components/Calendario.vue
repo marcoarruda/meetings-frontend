@@ -99,7 +99,7 @@
             </v-card-actions>
           </v-card>
         </v-menu>
-        <app-form :open="open" :data="data" :nome="nome" :inicio="inicio" :fim="fim" @openChanged="limparDados()" @dadosEvento="open=false; teste=$event; criarEvento(teste)" />
+        <app-form :open="open" :data="data" :evento="evento" @openChanged="limparDados()" @dadosEvento="open=false; teste=$event; criarEvento(teste)" />
       </v-sheet>
     </v-col>
   </v-row>
@@ -113,9 +113,7 @@ export default {
     appForm: ReuniaoForm
   },
   data: () => ({
-    fim: null,
-    inicio: null,
-    nome: '',
+    evento: '',
     data: '',
     open: false,
     teste: 'teste',
@@ -184,30 +182,38 @@ export default {
       this.data = date
       this.open=true
     },
-    openFormEditar({ date, event }){
-      this.data = date
-      this.inicio= event.start.split(' ')[1]
-      this.fim = event.end.split(' ')[1]
-      this.nome = event.name
+    openFormEditar({ event }){
+      this.evento = {
+        id: event.id,
+        dataI: event.start.split(' ')[0],
+        dataF: event.end.split(' ')[0],
+        inicio: event.start.split(' ')[1],
+        fim: event.end.split(' ')[1],
+        nome: event.name
+      }
+      this.open=true
     },
     limparDados(){
-      this.nome=''
-      this.fim=null
-      this.inicio=null
-      this.sala=''
       this.data=''
       this.open = false
+      this.evento = ''
     },
     criarEvento(teste){
-      // eslint-disable-next-line no-console
-      console.log(teste)
-
-      this.events.push({
-        name: this.teste.nome,
-        start: this.teste.inicio,
-        end: this.teste.fim,
-        color: this.colors[this.rnd(0, this.colors.length - 1)],
-      })
+      let evento = this.events.find( e => e.id==teste.id)
+      if(evento != undefined ){
+        evento.name = this.teste.nome
+        evento.start = this.teste.inicio
+        evento.end = this.teste.fim
+        evento.color = this.colors[this.rnd(0, this.colors.length - 1)]
+      }else {
+        this.events.push({
+          id: Math.floor(Math.random() * 10),
+          name: this.teste.nome,
+          start: this.teste.inicio,
+          end: this.teste.fim,
+          color: this.colors[this.rnd(0, this.colors.length - 1)],
+        })
+      }
 
     },
     getEventColor (event) {
