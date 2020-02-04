@@ -120,6 +120,7 @@ export default {
     open: false,
     teste: 'teste',
     focus: '',
+    today: new Date().toISOString().split('T')[0],
     type: 'month',
     typeToLabel: {
       month: 'Month',
@@ -200,8 +201,6 @@ export default {
     criarEvento(teste){
       // eslint-disable-next-line no-console
       console.log(teste)
-
-      const events = []
 
       this.events.push({
         name: this.teste.nome,
