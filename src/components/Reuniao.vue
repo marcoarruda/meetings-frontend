@@ -11,11 +11,14 @@
             <v-container>
               <v-row>
                 <v-col cols="12" sm="6">
-                  <v-text-field v-model="formData.nome" label="Nome" />
+                  <v-text-field
+                    v-model="formData.nome" label="Nome" 
+                    :rules="[...form.rules.ruleNotEmpty, ...ruleLength]"
+                  />
                 </v-col>
                 <v-col cols="12" sm="6">
                   <v-select
-                    v-model="sala"
+                    v-model="formData.sala"
                     :items="['01', '02', '03']"
                     label="Sala"
                     :rules="form.rules.ruleSelect"
@@ -36,7 +39,7 @@
                       <v-text-field
                         v-model="formData.dataI"
                         label="Data inicio"
-                        :rules="[...form.rules.ruleNotEmpty, ...ruleFimData]"
+                        :rules="form.rules.ruleNotEmpty"
                         readonly
                         v-on="on"
                       />
@@ -83,7 +86,7 @@
                       <v-text-field
                         v-model="formData.inicio"
                         label="Inicio"
-                        :rules="[...form.rules.ruleNotEmpty, ...ruleFimData]"
+                        :rules="form.rules.ruleNotEmpty"
                         readonly
                         v-on="on"
                       />
@@ -141,14 +144,16 @@
 import Vue from 'vue'
 
 export default {
-  props: ['open', 'data', 'evento'],
+  props: ['open', 'dataDia', 'evento'],
   data() {
     return {
+      ready: false,
       formData: {
         id:'',
         inicio: null,
         fim: null,
         nome: '',
+        sala: '',
         dataI:null,
         menuDataI: false,
         dataF: null,
@@ -161,7 +166,6 @@ export default {
           ruleNotEmpty: [v => !!v || 'Campo não pode ser vazio']
         }
       },
-      sala: '',
       menu2: false,
       modal2: false
     }
@@ -178,18 +182,24 @@ export default {
             new Date(this.formData.dataF + ' ' + this.formData.fim).getTime() ||
           'Inicio deve ser menor que fim'
       ]
+    },
+    ruleLength() {
+      return [
+        v => this.formData.nome.length > 3 || 'Nome deve ter no minimo 4 caracteres'
+      ]
     }
   },
   watch:{
-    data: function(){
-      if(this.data != ''){
-        this.formData.dataI = this.data
-        this.formData.dataF = this.data
+    dataDia(){
+      if(this.dataDia != ''){
+        this.formData.dataI = this.dataDia
+        this.formData.dataF = this.dataDia
       }
     },
-    evento: function(){
+    evento(){
       if(this.evento != ''){
         this.formData.id = this.evento.id
+        this.formData.sala = this.evento.sala
         this.formData.inicio = this.evento.inicio
         this.formData.fim = this.evento.fim
         this.formData.dataI = this.evento.dataI
@@ -200,11 +210,12 @@ export default {
     formData:{
       deep: true,
       handler(to, from) {
-        // eslint-disable-next-line no-console
-        // console.log(to)
-        this.$refs.form.validate()
+        this.$refs.form != undefined && this.$refs.form.validate()
       }
     }
+  },
+  mounted(){
+    this.ready = true
   },
   methods: {
     openChanged() {
@@ -212,8 +223,8 @@ export default {
       this.formData.nome = ''
       this.formData.fim = null
       this.formData.inicio = null
-      this.sala = ''
-      this.data = ''
+      this.formData.sala = ''
+      this.dataDia = ''
       this.open = false
       this.$emit('openChanged', this.open)
     },
@@ -223,14 +234,14 @@ export default {
         nome: this.formData.nome,
         inicio: this.formData.dataI + ' ' + this.formData.inicio,
         fim: this.formData.dataI + ' ' + this.formData.fim,
-        sala: this.sala
+        sala: this.formData.sala
       }
       this.formData.id=''
       this.formData.nome = ''
       this.formData.fim = null
       this.formData.inicio = null
-      this.sala = ''
-      this.data = ''
+      this.formData.sala = ''
+      this.dataDia = ''
       this.open = false
       this.$emit('dadosEvento', evento)
     }

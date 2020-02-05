@@ -99,7 +99,8 @@
             </v-card-actions>
           </v-card>
         </v-menu>
-        <app-form :open="open" :data="data" :evento="evento" @openChanged="limparDados()" @dadosEvento="open=false; teste=$event; criarEvento(teste)" />
+        <!-- eslint-disable-next-line vue/attribute-hyphenation -->
+        <app-form :open="open" :dataDia="dataDia" :evento="evento" @openChanged="limparDados()" @dadosEvento="open=false; teste=$event; criarEvento(teste)" />
       </v-sheet>
     </v-col>
   </v-row>
@@ -114,7 +115,7 @@ export default {
   },
   data: () => ({
     evento: '',
-    data: '',
+    dataDia: '',
     open: false,
     teste: 'teste',
     focus: '',
@@ -179,12 +180,13 @@ export default {
       this.type = 'day'
     },
     openFormCriar({ date}){
-      this.data = date
+      this.dataDia = date
       this.open=true
     },
     openFormEditar({ event }){
       this.evento = {
         id: event.id,
+        sala: event.sala,
         dataI: event.start.split(' ')[0],
         dataF: event.end.split(' ')[0],
         inicio: event.start.split(' ')[1],
@@ -194,7 +196,7 @@ export default {
       this.open=true
     },
     limparDados(){
-      this.data=''
+      this.dataDia=''
       this.open = false
       this.evento = ''
     },
@@ -202,12 +204,14 @@ export default {
       let evento = this.events.find( e => e.id==teste.id)
       if(evento != undefined ){
         evento.name = this.teste.nome
+        evento.sala = this.teste.sala
         evento.start = this.teste.inicio
         evento.end = this.teste.fim
         evento.color = this.colors[this.rnd(0, this.colors.length - 1)]
       }else {
         this.events.push({
           id: Math.floor(Math.random() * 10),
+          sala: this.teste.sala,
           name: this.teste.nome,
           start: this.teste.inicio,
           end: this.teste.fim,
