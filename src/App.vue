@@ -1,28 +1,21 @@
 <template>
   <v-app>
-    <v-app-bar app>
-      <v-app-bar-nav-icon />
-      <v-toolbar-title>
-        Meetings
-        &nbsp;|&nbsp;
-        Usuário
-      </v-toolbar-title>
-    </v-app-bar>
-
+    <appHeader />
     <v-content>
-      <Calendario />
+      <v-container>
+        <router-view />
+      </v-container>
     </v-content>
   </v-app>
 </template>
 
 <script>
-import Calendario from './components/Calendario'
-
+import Header from './components/Header'
 export default {
   name: 'App',
 
   components: {
-    Calendario
+    appHeader: Header
   },
 
   data: () => ({
