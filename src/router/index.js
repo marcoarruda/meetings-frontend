@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import store from '../store/index'
 import VueRouter from 'vue-router'
 import Calendario from '../views/Calendario.vue'
 import Relatorio from '../views/Relatorio.vue'
@@ -33,6 +34,22 @@ const routes = [
 const router = new VueRouter({
   mode: 'history',
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  if (store.getters.getUserIsAuth) {
+    if(to.name == 'login') {
+      next('/')
+    } else {
+      next()
+    }
+  } else {
+    if(to.name != 'login') {
+      next('/login')
+    } else {
+      next()
+    }
+  }
 })
 
 export default router

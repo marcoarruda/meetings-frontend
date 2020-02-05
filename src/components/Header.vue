@@ -34,6 +34,7 @@
   </div>
 </template>
 <script>
+import { mapActions, mapGetters } from 'vuex'
 export default {
   data() {
     return {
@@ -54,7 +55,7 @@ export default {
     this.items = [
       { title: 'Relatorio', to: '/relatorio', click: () => false },
       { title: 'Calendario', to: '/', click: () => false },
-      { title: 'Sair', icon: 'mdi-logout', to: '/logout', click: () => false }
+      { title: 'Sair', icon: 'mdi-logout', to: '/login', click: this.actionUserLogout }
     ]
     this.updatePageTitle(path)
   },

@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <appHeader />
+    <appHeader v-if="'login'.indexOf($route.name) < 0" />
     <v-content>
       <v-container>
         <router-view />
@@ -11,6 +11,7 @@
 
 <script>
 import Header from './components/Header'
+
 export default {
   name: 'App',
 
