@@ -141,7 +141,6 @@
   </v-row>
 </template>
 <script>
-import Vue from 'vue'
 
 export default {
   props: ['open', 'dataDia', 'evento'],

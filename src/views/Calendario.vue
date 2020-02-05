@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import ReuniaoForm from './Reuniao.vue'
+import ReuniaoForm from '../components/Reuniao.vue'
 
 export default {
   components: {
