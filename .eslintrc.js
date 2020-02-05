@@ -1,17 +1,39 @@
 module.exports = {
-  root: true,
-  env: {
-    node: true
+  "env": {
+    "browser": true,
+    "es6": true
   },
-  'extends': [
-    'plugin:vue/essential',
-    'eslint:recommended'
+  "extends": [
+    "eslint:recommended",
+    "plugin:vue/essential",
+    "plugin:vue/recommended"
   ],
-  rules: {
-    'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
   },
-  parserOptions: {
-    parser: 'babel-eslint'
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "plugins": ["vue"],
+  "rules": {
+    "indent": ["error", 2, { "SwitchCase": 1 }],
+    "linebreak-style": ["error", "unix"],
+    "no-unused-vars": "warn",
+    "quotes": ["error", "single"],
+    "semi": ["error", "never"],
+    "vue/singleline-html-element-content-newline": "off",
+    "vue/multiline-html-element-content-newline": "off",
+    "vue/max-attributes-per-line": [
+      "error",
+      {
+        "singleline": 10,
+        "multiline": {
+          "max": 5,
+          "allowFirstLine": false
+        }
+      }
+    ]
   }
 }
