@@ -5,6 +5,19 @@ import store from './store'
 import vuetify from './plugins/vuetify'
 import vueresource from 'vue-resource'
 
+import Amplify, * as AmplifyModules from 'aws-amplify'
+import { AmplifyPlugin } from 'aws-amplify-vue'
+
+const awsconfig = {
+  Auth: {
+    region: 'us-east-1',
+    userPoolId: 'us-east-1_qToVlCku5',
+    userPoolWebClientId: 'q3ntk8mcvu2p4ma8qm0sqgji7'
+  }
+}
+Amplify.configure(awsconfig)
+Vue.use(AmplifyPlugin, AmplifyModules)
+
 Vue.config.productionTip = false
 
 Vue.use(vueresource)
