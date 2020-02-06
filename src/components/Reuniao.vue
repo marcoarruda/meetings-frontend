@@ -19,7 +19,7 @@
                 <v-col cols="12" sm="6">
                   <v-select
                     v-model="formData.sala"
-                    :items="['01', '02', '03']"
+                    :items="[1, 2, 3]"
                     label="Sala"
                     :rules="form.rules.ruleSelect"
                   />
@@ -141,6 +141,7 @@
   </v-row>
 </template>
 <script>
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   props: ['open', 'dataDia', 'evento'],
@@ -148,6 +149,8 @@ export default {
     return {
       ready: false,
       formData: {
+        error: false,
+        errorMessage: '',
         id:'',
         inicio: null,
         fim: null,
@@ -170,6 +173,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['getUser', 'getRequestParams' ]),
     ruleFimData() {
       // eslint-disable-next-line no-console
       // console.log(new Date(this.formData.dataI + ' ' + this.inicio).getTime())
@@ -215,6 +219,7 @@ export default {
   },
   mounted(){
     this.ready = true
+    this.listarSalas()
   },
   methods: {
     openChanged() {
@@ -227,13 +232,28 @@ export default {
       this.open = false
       this.$emit('openChanged', this.open)
     },
-    dadosEvento() {
+    async dadosEvento() {
       let evento = {
         id: this.formData.id,
         nome: this.formData.nome,
         inicio: this.formData.dataI + ' ' + this.formData.inicio,
         fim: this.formData.dataI + ' ' + this.formData.fim,
         sala: this.formData.sala
+      }
+      try {
+        this.error = false
+        let parametros = {
+          sala_id: this.formData.sala,
+          inicio: this.formData.dataI + 'T' + this.formData.inicio + 'Z',
+          fim: this.formData.dataI + 'T' + this.formData.fim + 'Z'
+        }
+        const response = await this.$http.post('reuniao/agendar', parametros, this.getRequestParams)
+        let t = await response.json()
+        // eslint-disable-next-line no-console
+        console.log(t)
+      } catch (err) {
+        this.errorMessage = err
+        this.error = true
       }
       this.formData.id=''
       this.formData.nome = ''
@@ -243,6 +263,16 @@ export default {
       this.dataDia = ''
       this.open = false
       this.$emit('dadosEvento', evento)
+    },
+    async listarSalas(){
+      // try {
+      const response = await this.$http.get('sala/listar', this.getRequestParams)
+      let t = await response.json()
+      // eslint-disable-next-line no-console
+      console.log(t)
+      // } catch (error) {
+        
+      // }
     }
   }
 }

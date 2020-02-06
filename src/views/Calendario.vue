@@ -108,12 +108,15 @@
 
 <script>
 import ReuniaoForm from '../components/Reuniao.vue'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   components: {
     appForm: ReuniaoForm
   },
   data: () => ({
+    error: false,
+    errorMessage: '',
     evento: '',
     dataDia: '',
     open: false,
@@ -137,6 +140,7 @@ export default {
     names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
   }),
   computed: {
+    ...mapGetters(['getUser', 'getRequestParams' ]),
     title () {
       const { start, end } = this
       if (!start || !end) {
@@ -173,11 +177,27 @@ export default {
   },
   mounted () {
     this.$refs.calendar.checkChange()
+    this.listarReuniao()
   },
   methods: {
     viewDay ({ date }) {
       this.focus = date
       this.type = 'day'
+    },
+    async listarReuniao(){
+      const { start, end } = this
+      // eslint-disable-next-line no-console
+      console.log(start)
+      try {
+        this.error = false
+        const response = await this.$http.get('reuniao/listar/'+start.year+'/'+this.monthFormatter(start), this.getRequestParams)
+        let t = await response.json()
+        // eslint-disable-next-line no-console
+        console.log(t)
+      } catch (err) {
+        this.errorMessage = err
+        this.error = true
+      }
     },
     openFormCriar({ date}){
       this.dataDia = date
