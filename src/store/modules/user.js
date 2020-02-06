@@ -1,4 +1,5 @@
 import { Auth } from 'aws-amplify'
+import router from '../../router/index'
 
 const state = {
   user: null
@@ -27,6 +28,7 @@ const mutations = {
   },
   'mutUserLogout': (state) => {
     state.user = null
+    router.push({path: '/login'})
   },
 }
 

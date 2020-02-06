@@ -11,8 +11,8 @@ import { AmplifyPlugin } from 'aws-amplify-vue'
 const awsconfig = {
   Auth: {
     region: 'us-east-1',
-    userPoolId: 'us-east-1_v0tTYAqcC',
-    userPoolWebClientId: '4nvc25mb5be7p1fiu2edll2epa'
+    userPoolId: 'us-east-1_qToVlCku5',
+    userPoolWebClientId: 'q3ntk8mcvu2p4ma8qm0sqgji7'
   }
 }
 Amplify.configure(awsconfig)

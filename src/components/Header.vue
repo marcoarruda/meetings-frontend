@@ -36,6 +36,7 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 export default {
+  name: 'Header',
   data() {
     return {
       page_title: '',
@@ -45,6 +46,9 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapGetters(['getUser', 'getRequestParams', ])
+  },
   watch: {
     $route(to, from) {
       this.updatePageTitle(to.path)
@@ -52,14 +56,16 @@ export default {
   },
   mounted(){
     const path = this.$route.path
+    this.updatePageTitle(path)
     this.items = [
-      { title: 'Relatorio', to: '/relatorio', click: () => false },
       { title: 'Calendario', to: '/', click: () => false },
-      { title: 'Sair', icon: 'mdi-logout', to: '/login', click: this.actionUserLogout }
+      { title: 'Relatorio', to: '/relatorio', click: () => false },
+      { title: 'Sair', icon: 'mdi-logout', to:false, click: this.actionUserLogout }
     ]
     this.updatePageTitle(path)
   },
   methods: {
+    ...mapActions(['actionUserLogout' ]),
     updatePageTitle(path) {
       try {
         this.page_title = this.items.find(item => item.to == path).title
