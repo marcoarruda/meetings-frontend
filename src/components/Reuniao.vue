@@ -1,18 +1,26 @@
 <template>
   <v-row justify="center">
-    <v-dialog v-model="open" persistent max-width="600px">
+    <v-dialog v-model="open" max-width="600px">
       <v-form ref="form" v-model="form.valid">
-        <v-card color="grey lighten-4" min-width="350px">
+        <v-card color="grey lighten-4" min-width="350px" @close="openChanged">
           <v-toolbar color="blue">
             <v-toolbar-title>Reservar Sala</v-toolbar-title>
             <v-spacer />
+
+            <v-btn icon :disabled="formData.id == ''" @click="deletarReuniao">
+              <v-icon color="white">mdi-delete</v-icon>
+            </v-btn>
           </v-toolbar>
           <v-card-text>
             <v-container>
               <v-row>
+                <v-col v-show="error" cols="12" md="12" lg="12" xl="12">
+                  <v-alert dense outlined type="error">{{ errorMessage }}</v-alert>
+                </v-col>
                 <v-col cols="12" sm="6">
                   <v-text-field
-                    v-model="formData.nome" label="Nome" 
+                    v-model="formData.nome"
+                    label="Nome"
                     :rules="[...form.rules.ruleNotEmpty, ...ruleLength]"
                   />
                 </v-col>
@@ -132,8 +140,14 @@
             </v-container>
           </v-card-text>
           <v-card-actions>
-            <v-btn text color="secondary" @click="openChanged">Cancelar</v-btn>
-            <v-btn text color="blue darken-1" :disabled="!form.valid" @click="dadosEvento">Salvar</v-btn>
+            <v-btn text color="secondary" :disabled="loading" @click="openChanged">Cancelar</v-btn>
+            <v-btn
+              text
+              color="blue darken-1"
+              :disabled="!form.valid"
+              :loading="loading"
+              @click="dadosEvento"
+            >Salvar</v-btn>
           </v-card-actions>
         </v-card>
       </v-form>
@@ -147,16 +161,17 @@ export default {
   props: ['open', 'dataDia', 'evento'],
   data() {
     return {
+      loading: false,
       ready: false,
       formData: {
         error: false,
         errorMessage: '',
-        id:'',
+        id: '',
         inicio: null,
         fim: null,
         nome: '',
         sala: '',
-        dataI:null,
+        dataI: null,
         menuDataI: false,
         dataF: null,
         menuDataF: false
@@ -173,7 +188,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['getUser', 'getRequestParams' ]),
+    ...mapGetters(['getUser', 'getRequestParams']),
     ruleFimData() {
       // eslint-disable-next-line no-console
       // console.log(new Date(this.formData.dataI + ' ' + this.inicio).getTime())
@@ -188,19 +203,21 @@ export default {
     },
     ruleLength() {
       return [
-        v => this.formData.nome.length > 3 || 'Nome deve ter no minimo 4 caracteres'
+        v =>
+          this.formData.nome.length > 3 ||
+          'Nome deve ter no minimo 4 caracteres'
       ]
     }
   },
-  watch:{
-    dataDia(){
-      if(this.dataDia != ''){
+  watch: {
+    dataDia() {
+      if (this.dataDia != '') {
         this.formData.dataI = this.dataDia
         this.formData.dataF = this.dataDia
       }
     },
-    evento(){
-      if(this.evento != ''){
+    evento() {
+      if (this.evento != '') {
         this.formData.id = this.evento.id
         this.formData.sala = this.evento.sala
         this.formData.inicio = this.evento.inicio
@@ -210,19 +227,21 @@ export default {
         this.formData.nome = this.evento.nome
       }
     },
-    formData:{
+    formData: {
       deep: true,
       handler(to, from) {
         this.$refs.form != undefined && this.$refs.form.validate()
       }
     }
   },
-  mounted(){
+  mounted() {
     this.ready = true
     this.listarSalas()
   },
   methods: {
     openChanged() {
+      // eslint-disable-next-line no-console
+      console.log('openChanged')
       this.formData.id = ''
       this.formData.nome = ''
       this.formData.fim = null
@@ -241,38 +260,89 @@ export default {
         sala: this.formData.sala
       }
       try {
+        this.loading = true
+
         this.error = false
         let parametros = {
+          id: this.formData.id,
+          nome: this.formData.nome,
           sala_id: this.formData.sala,
           inicio: this.formData.dataI + 'T' + this.formData.inicio + 'Z',
           fim: this.formData.dataI + 'T' + this.formData.fim + 'Z'
         }
-        const response = await this.$http.post('reuniao/agendar', parametros, this.getRequestParams)
-        let t = await response.json()
-        // eslint-disable-next-line no-console
-        console.log(t)
+        if (this.formData.id == '') {
+          const response = await this.$http.post(
+            'reuniao/agendar',
+            parametros,
+            this.getRequestParams
+          )
+          let t = await response.json()
+          // eslint-disable-next-line no-console
+          console.log(t)
+          evento.id = t.reuniao_id
+        } else {
+          const response = await this.$http.put(
+            'reuniao/alterar',
+            parametros,
+            this.getRequestParams
+          )
+          let t = await response.json()
+          // eslint-disable-next-line no-console
+          console.log(t)
+        }
+
+        this.loading = false
+        this.formData.id = ''
+        this.formData.nome = ''
+        this.formData.fim = null
+        this.formData.inicio = null
+        this.formData.sala = ''
+        this.dataDia = ''
+        this.open = false
+        this.$emit('dadosEvento', evento)
       } catch (err) {
-        this.errorMessage = err
+        this.loading = false
+
+        // eslint-disable-next-line no-console
+        console.log(err.data.message.message)
+        this.errorMessage = err.data.message.message
         this.error = true
       }
-      this.formData.id=''
-      this.formData.nome = ''
-      this.formData.fim = null
-      this.formData.inicio = null
-      this.formData.sala = ''
-      this.dataDia = ''
-      this.open = false
-      this.$emit('dadosEvento', evento)
     },
-    async listarSalas(){
+    async listarSalas() {
       // try {
-      const response = await this.$http.get('sala/listar', this.getRequestParams)
+      const response = await this.$http.get(
+        'sala/listar',
+        this.getRequestParams
+      )
       let t = await response.json()
       // eslint-disable-next-line no-console
       console.log(t)
       // } catch (error) {
-        
+
       // }
+    },
+    async deletarReuniao() {
+      if (this.formData.id != '') {
+        // eslint-disable-next-line no-console
+        console.log(this.formData.id)
+        try {
+          this.error = false
+          let parametros = {
+            id: this.formData.id
+          }
+          const response = await this.$http.delete(
+            `reuniao/excluir/${this.formData.id}`,
+            this.getRequestParams
+          )
+          let t = await response.json()
+          // eslint-disable-next-line no-console
+          console.log(t)
+        } catch (err) {
+          this.errorMessage = err.data.message.message
+          this.error = true
+        }
+      }
     }
   }
 }
