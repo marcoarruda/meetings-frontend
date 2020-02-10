@@ -39,6 +39,7 @@
         </v-toolbar>
       </v-sheet>
       <v-sheet height="600">
+        <v-alert v-show="error" dense outlined type="error">{{ errorMessage }}</v-alert>
         <v-calendar
           ref="calendar"
           v-model="focus"
@@ -51,7 +52,7 @@
           @click:event="openFormEditar"
           @click:more="viewDay"
           @click:date="viewDay"
-          @change="listarReuniao"
+          @change="updateRange"
         />
         <v-menu
           v-model="selectedOpen"
@@ -88,6 +89,7 @@
           :evento="evento"
           @openChanged="limparDados()"
           @dadosEvento="open=false; teste=$event; criarEvento(teste)"
+          @deletar="teste=$event; deletarEvento(teste)"
         />
       </v-sheet>
     </v-col>
@@ -189,21 +191,19 @@ export default {
       this.focus = date
       this.type = 'day'
     },
-    async listarReuniao({ start, end }) {
-      this.start = start
-      this.end = end
+    async listarReuniao() {
 
       try {
         this.error = false
         const response = await this.$http.get(
-          'reuniao/listar/' + start.year + '/' + this.monthFormatter(start),
+          'reuniao/listar/' + this.start.year + '/' + this.start.month,
           this.getRequestParams
         )
         let t = await response.json()
         // eslint-disable-next-line no-console
         console.log(this.getUser.username)
         this.events = []
-        for (let i = 0; i <= t.reunioes.length; i++) {
+        for (let i = 0; i < t.reunioes.length; i++) {
           this.events.push({
             id: t.reunioes[i].id,
             sala: t.reunioes[i].SalaId,
@@ -223,6 +223,8 @@ export default {
           })
         }
       } catch (err) {
+        // eslint-disable-next-line no-console
+        console.log('erro')
         this.errorMessage = err
         this.error = true
       }
@@ -247,6 +249,7 @@ export default {
       this.dataDia = ''
       this.open = false
       this.evento = ''
+      this.error = false
     },
     criarEvento(teste) {
       let evento = this.events.find(e => e.id == teste.id)
@@ -266,6 +269,14 @@ export default {
           color: this.colors[0]
         })
       }
+      this.listarReuniao()
+    },
+    deletarEvento(id){
+      let evento = this.events.filter(function(e){
+        return e.id != id
+      })
+      this.events = evento
+      this.listarReuniao()
     },
     getEventColor(event) {
       return event.color
@@ -296,31 +307,9 @@ export default {
       nativeEvent.stopPropagation()
     },
     updateRange({ start, end }) {
-      const events = []
-
-      const min = new Date(`${start.date}T00:00:00`)
-      const max = new Date(`${end.date}T23:59:59`)
-      const days = (max.getTime() - min.getTime()) / 86400000
-      const eventCount = this.rnd(days, days + 20)
-
-      for (let i = 0; i < eventCount; i++) {
-        const allDay = this.rnd(0, 3) === 0
-        const firstTimestamp = this.rnd(min.getTime(), max.getTime())
-        const first = new Date(firstTimestamp - (firstTimestamp % 900000))
-        const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
-        const second = new Date(first.getTime() + secondTimestamp)
-
-        events.push({
-          name: this.names[this.rnd(0, this.names.length - 1)],
-          start: this.formatDate(first, !allDay),
-          end: this.formatDate(second, !allDay),
-          color: this.colors[this.rnd(0, this.colors.length - 1)]
-        })
-      }
-
       this.start = start
       this.end = end
-      this.events = events
+      this.listarReuniao()
     },
     nth(d) {
       return d > 3 && d < 21

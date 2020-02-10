@@ -7,7 +7,7 @@
             <v-toolbar-title>Reservar Sala</v-toolbar-title>
             <v-spacer />
 
-            <v-btn icon :disabled="formData.id == ''" @click="deletarReuniao">
+            <v-btn icon :disabled="formData.id == '' || loading" @click="deletarReuniao">
               <v-icon color="white">mdi-delete</v-icon>
             </v-btn>
           </v-toolbar>
@@ -27,7 +27,9 @@
                 <v-col cols="12" sm="6">
                   <v-select
                     v-model="formData.sala"
-                    :items="[1, 2, 3]"
+                    :items="salas"
+                    item-text="nome"
+                    item-value="id"
                     label="Sala"
                     :rules="form.rules.ruleSelect"
                   />
@@ -108,6 +110,9 @@
                   </v-menu>
                 </v-col>
                 <v-col cols="11" sm="5">
+                  <!-- <v-card-text>
+                    <v-text-field v-model="formData.fim" v-mask="mask" label="Value"></v-text-field>
+                  </v-card-text> -->
                   <v-menu
                     ref="menu2"
                     v-model="modal2"
@@ -156,13 +161,19 @@
 </template>
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import { mask } from 'vue-the-mask'
 
 export default {
   props: ['open', 'dataDia', 'evento'],
+  directives: {
+    mask,
+  },
   data() {
     return {
+      mask: '##:##',
       loading: false,
       ready: false,
+      salas: '',
       formData: {
         error: false,
         errorMessage: '',
@@ -242,6 +253,7 @@ export default {
     openChanged() {
       // eslint-disable-next-line no-console
       console.log('openChanged')
+      this.error = false
       this.formData.id = ''
       this.formData.nome = ''
       this.formData.fim = null
@@ -256,7 +268,7 @@ export default {
         id: this.formData.id,
         nome: this.formData.nome,
         inicio: this.formData.dataI + ' ' + this.formData.inicio,
-        fim: this.formData.dataI + ' ' + this.formData.fim,
+        fim: this.formData.dataF + ' ' + this.formData.fim,
         sala: this.formData.sala
       }
       try {
@@ -268,7 +280,7 @@ export default {
           nome: this.formData.nome,
           sala_id: this.formData.sala,
           inicio: this.formData.dataI + 'T' + this.formData.inicio + 'Z',
-          fim: this.formData.dataI + 'T' + this.formData.fim + 'Z'
+          fim: this.formData.dataF + 'T' + this.formData.fim + 'Z'
         }
         if (this.formData.id == '') {
           const response = await this.$http.post(
@@ -316,8 +328,9 @@ export default {
         this.getRequestParams
       )
       let t = await response.json()
+      this.salas = t.salas
       // eslint-disable-next-line no-console
-      console.log(t)
+      console.log(this.salas)
       // } catch (error) {
 
       // }
@@ -327,18 +340,21 @@ export default {
         // eslint-disable-next-line no-console
         console.log(this.formData.id)
         try {
+          this.loading = true
           this.error = false
-          let parametros = {
-            id: this.formData.id
-          }
+
           const response = await this.$http.delete(
             `reuniao/excluir/${this.formData.id}`,
             this.getRequestParams
           )
           let t = await response.json()
-          // eslint-disable-next-line no-console
-          console.log(t)
+          this.$emit('deletar', this.formData.id)
+          this.openChanged()
+          this.loading = false
         } catch (err) {
+          this.loading = false
+          // eslint-disable-next-line no-console
+          console.log(err.data.message.message)
           this.errorMessage = err.data.message.message
           this.error = true
         }
