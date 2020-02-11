@@ -49,6 +49,7 @@
                       <v-text-field
                         v-model="formData.dataI"
                         label="Data inicio"
+                        prepend-icon="mdi-calendar"
                         :rules="form.rules.ruleNotEmpty"
                         readonly
                         v-on="on"
@@ -70,6 +71,7 @@
                       <v-text-field
                         v-model="formData.dataF"
                         label="Data fim"
+                        prepend-icon="mdi-calendar"
                         :rules="[...form.rules.ruleNotEmpty, ...ruleFimData]"
                         readonly
                         v-on="on"
@@ -96,6 +98,7 @@
                       <v-text-field
                         v-model="formData.inicio"
                         label="Inicio"
+                        prepend-icon="mdi-clock"
                         :rules="form.rules.ruleNotEmpty"
                         readonly
                         v-on="on"
@@ -112,7 +115,7 @@
                 <v-col cols="11" sm="5">
                   <!-- <v-card-text>
                     <v-text-field v-model="formData.fim" v-mask="mask" label="Value"></v-text-field>
-                  </v-card-text> -->
+                  </v-card-text>-->
                   <v-menu
                     ref="menu2"
                     v-model="modal2"
@@ -128,6 +131,7 @@
                       <v-text-field
                         v-model="formData.fim"
                         label="Fim"
+                        prepend-icon="mdi-clock"
                         :rules="[...form.rules.ruleNotEmpty, ...ruleFimData]"
                         readonly
                         v-on="on"
@@ -164,19 +168,19 @@ import { mapGetters, mapActions } from 'vuex'
 import { mask } from 'vue-the-mask'
 
 export default {
-  props: ['open', 'dataDia', 'evento'],
   directives: {
-    mask,
+    mask
   },
+  props: ['open', 'dataDia', 'evento'],
   data() {
     return {
       mask: '##:##',
       loading: false,
       ready: false,
       salas: '',
+      error: false,
+      errorMessage: '',
       formData: {
-        error: false,
-        errorMessage: '',
         id: '',
         inicio: null,
         fim: null,
@@ -201,10 +205,6 @@ export default {
   computed: {
     ...mapGetters(['getUser', 'getRequestParams']),
     ruleFimData() {
-      // eslint-disable-next-line no-console
-      // console.log(new Date(this.formData.dataI + ' ' + this.inicio).getTime())
-      // eslint-disable-next-line no-console
-      // console.log(new Date(this.formData.dataF + ' ' + this.fim).getTime())
       return [
         v =>
           new Date(this.formData.dataI + ' ' + this.formData.inicio).getTime() <
@@ -314,26 +314,36 @@ export default {
         this.$emit('dadosEvento', evento)
       } catch (err) {
         this.loading = false
-
-        // eslint-disable-next-line no-console
-        console.log(err.data.message.message)
-        this.errorMessage = err.data.message.message
         this.error = true
+        if (err.data.message != undefined) {
+          this.errorMessage = err.data.message.message
+        } else {
+          this.errorMessage = 'Houve um erro, tente novamente mais tarde'
+        }
       }
     },
     async listarSalas() {
-      // try {
-      const response = await this.$http.get(
-        'sala/listar',
-        this.getRequestParams
-      )
-      let t = await response.json()
-      this.salas = t.salas
-      // eslint-disable-next-line no-console
-      console.log(this.salas)
-      // } catch (error) {
-
-      // }
+      try {
+        this.loading = true
+        this.error = false
+        const response = await this.$http.get(
+          'sala/listar',
+          this.getRequestParams
+        )
+        let t = await response.json()
+        this.salas = t.salas
+        this.loading = false
+        // eslint-disable-next-line no-console
+        console.log(this.salas)
+      } catch (err) {
+        this.loading = false
+        this.error = true
+        if (err.data.message != undefined) {
+          this.errorMessage = err.data.message.message
+        } else {
+          this.errorMessage = 'Houve um erro, tente novamente mais tarde'
+        }
+      }
     },
     async deletarReuniao() {
       if (this.formData.id != '') {
@@ -353,10 +363,12 @@ export default {
           this.loading = false
         } catch (err) {
           this.loading = false
-          // eslint-disable-next-line no-console
-          console.log(err.data.message.message)
-          this.errorMessage = err.data.message.message
           this.error = true
+          if (err.data.message != undefined) {
+            this.errorMessage = err.data.message.message
+          } else {
+            this.errorMessage = 'Houve um erro, tente novamente mais tarde'
+          }
         }
       }
     }

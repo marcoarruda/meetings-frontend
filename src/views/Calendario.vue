@@ -54,34 +54,6 @@
           @click:date="viewDay"
           @change="updateRange"
         />
-        <v-menu
-          v-model="selectedOpen"
-          :close-on-content-click="false"
-          :activator="selectedElement"
-          offset-x
-        >
-          <v-card color="grey lighten-4" min-width="350px" flat>
-            <v-toolbar :color="selectedEvent.color" dark>
-              <v-btn icon>
-                <v-icon>mdi-pencil</v-icon>
-              </v-btn>
-              <v-toolbar-title v-html="selectedEvent.name" />
-              <v-spacer />
-              <v-btn icon>
-                <v-icon>mdi-heart</v-icon>
-              </v-btn>
-              <v-btn icon>
-                <v-icon>mdi-dots-vertical</v-icon>
-              </v-btn>
-            </v-toolbar>
-            <v-card-text>
-              <span v-html="selectedEvent.details" />
-            </v-card-text>
-            <v-card-actions>
-              <v-btn text color="secondary" @click="selectedOpen = false">Cancel</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-menu>
         <!-- eslint-disable-next-line vue/attribute-hyphenation -->
         <app-form
           :open="open"
@@ -201,7 +173,7 @@ export default {
         )
         let t = await response.json()
         // eslint-disable-next-line no-console
-        console.log(this.getUser.username)
+        console.log(this.getUser)
         this.events = []
         for (let i = 0; i < t.reunioes.length; i++) {
           this.events.push({
@@ -223,10 +195,12 @@ export default {
           })
         }
       } catch (err) {
-        // eslint-disable-next-line no-console
-        console.log('erro')
-        this.errorMessage = err
         this.error = true
+        if (err.data.message != undefined) {
+          this.errorMessage = err.data.message.message
+        } else {
+          this.errorMessage = 'Houve um erro, tente novamente mais tarde'
+        }
       }
     },
     openFormCriar({ date }) {
