@@ -203,7 +203,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['getUser', 'getRequestParams']),
+    ...mapGetters(['getUser', 'getRequestParams', 'getReuniao', 'getError']),
     ruleFimData() {
       return [
         v =>
@@ -250,6 +250,7 @@ export default {
     this.listarSalas()
   },
   methods: {
+    ...mapActions(['criarReuniao', ]),
     openChanged() {
       // eslint-disable-next-line no-console
       console.log('openChanged')
@@ -283,24 +284,31 @@ export default {
           fim: this.formData.dataF + 'T' + this.formData.fim + 'Z'
         }
         if (this.formData.id == '') {
-          const response = await this.$http.post(
-            'reuniao/agendar',
-            parametros,
-            this.getRequestParams
-          )
-          let t = await response.json()
+          this.criarReuniao(parametros)
+          if(this.getError != null){
+            // eslint-disable-next-line no-console
+            console.log(this.getError)
+            throw new Error(this.getError)
+          }
+          let reuniaoCriada = this.getReuniao
+          // const response = await this.$http.post(
+          //   'reuniao/agendar',
+          //   parametros,
+          //   this.getRequestParams
+          // )
+          // let t = await response.json()
           // eslint-disable-next-line no-console
-          console.log(t)
-          evento.id = t.reuniao_id
+          // console.log(reuniaoCriada)
+          evento.id = reuniaoCriada.reuniao_id
         } else {
-          const response = await this.$http.put(
-            'reuniao/alterar',
-            parametros,
-            this.getRequestParams
-          )
-          let t = await response.json()
+          // const response = await this.$http.put(
+          //   'reuniao/alterar',
+          //   parametros,
+          //   this.getRequestParams
+          // )
+          // let t = await response.json()
           // eslint-disable-next-line no-console
-          console.log(t)
+          // console.log(t)
         }
 
         this.loading = false
