@@ -3,6 +3,8 @@ import api from '../../api'
 const state = {
   reuniao: null,
   reunioes: [],
+  relatorio: [],
+  salas: [],
   error: null
 }
 
@@ -17,24 +19,29 @@ const getters = {
     // eslint-disable-next-line no-console
     console.log('entrei getReunioes')
     return state.reunioes
+  },
+  getRelatorio(state){
+    // eslint-disable-next-line no-console
+    console.log('entrei getRelatorio')
+    return state.relatorio
+  },
+  getSalas(state){
+    // eslint-disable-next-line no-console
+    console.log('entrei getSalas')
+    return state.salas
   }
 }
 
 const mutations = {
-  mSetReuniao(state, reuniao){
-    state.reuniao = reuniao
-  },
   async mCriarReuniao(state, reuniao){
-    state.reuniao = reuniao
-    let nome = state.reuniao.nome
-    let sala_id = state.reuniao.sala_id
-    let inicio = state.reuniao.inicio
-    let fim = state.reuniao.fim
+    let nome = reuniao.nome
+    let sala_id = reuniao.sala_id
+    let inicio = reuniao.inicio
+    let fim = reuniao.fim
 
     try {
-      let reuniao = await api.agendarReuniao(nome, sala_id, inicio, fim)
-      state.reuniao = reuniao
-      state.reunioes.push(reuniao)
+      let resposta = await api.agendarReuniao(nome, sala_id, inicio, fim)
+      state.reuniao = resposta
       // eslint-disable-next-line no-console
       console.log('nao entrei no catch')
     } catch (ex) {
@@ -43,23 +50,21 @@ const mutations = {
       state.error = ex
     }
   },
-  mAlterarReuniao(state, reuniao){
-    state.reuniao = reuniao
-    let id = state.reuniao.id
-    let nome = state.reuniao.nome
-    let sala_id = state.reuniao.sala_id
-    let inicio = state.reuniao.inicio
-    let fim = state.reuniao.fim
+  async mAlterarReuniao(state, reuniao){
+    let id = reuniao.id
+    let nome = reuniao.nome
+    let sala_id = reuniao.sala_id
+    let inicio = reuniao.inicio
+    let fim = reuniao.fim
 
-    api.alterarReuniao(id, nome, sala_id, inicio, fim).then((resposta) => {
+    try {
+      let resposta = await api.alterarReuniao(id, nome, sala_id, inicio, fim)
       state.reuniao = resposta
-      // eslint-disable-next-line no-console
-      console.log(state.reuniao)
-    }).catch(ex => {
+    } catch (ex) {
       // eslint-disable-next-line no-console
       console.log(ex)
       state.error = ex
-    })
+    }
   },
   mDeletarReuniao(state, id){
     api.deletarReuniao(id).then((resposta) => {
@@ -77,7 +82,29 @@ const mutations = {
       let reunioes = await api.listarReuniao(params.ano, params.mes)
       state.reunioes = await reunioes.reunioes
       // eslint-disable-next-line no-console
-      console.log(state.reunioes)
+      // console.log(state.reunioes)
+    } catch (error) {
+      state.error = error
+    }
+  },
+  async mListarRelatorio(state, params){
+    try {
+      let relatorio = await api.listarRelatorio(params.user, params.ano, params.mes)
+      state.relatorio = await relatorio.reunioes
+      // eslint-disable-next-line no-console
+      console.log(state.relatorio)
+
+    } catch (error) {
+      state.error = error
+    }
+  },
+  async mListarSalas(state){
+    try {
+      let salas = await api.listarSalas()
+      state.salas = await salas.salas
+      // eslint-disable-next-line no-console
+      console.log(state.salas)
+
     } catch (error) {
       state.error = error
     }
@@ -85,20 +112,28 @@ const mutations = {
 }
 
 const actions = {
-  async criarReuniao(context, reuniao){
-    await context.commit('mCriarReuniao', reuniao)
+  async criarReuniao(context, params){
+    await context.commit('mCriarReuniao', params.reuniao)
+    await context.commit('mListarReunioes', params.data)
   },
-  alterarReuniao(context, reuniao){
-    context.commit('mAlterarReuniao', reuniao)
+  async alterarReuniao(context, params){
+    await context.commit('mAlterarReuniao', params.reuniao)
+    await context.commit('mListarReunioes', params.data)
   },
-  deletarReuniao(context, id){
-    context.commit('mDeletarReuniao', id)
+  async deletarReuniao(context, params){
+    // eslint-disable-next-line no-console
+    console.log(params)
+    await context.commit('mDeletarReuniao', params.id)
+    await context.commit('mListarReunioes', params.data)
   },
   async listarReunioes(context, params){
     await context.commit('mListarReunioes',params)
   },
-  setReuniao(context, reuniao){
-    context.commit('mSetReuniao', reuniao)
+  async listarRelatorio(context, params){
+    await context.commit('mListarRelatorio', params)
+  },
+  async listarSalas(context){
+    await context.commit('mListarSalas')
   }
 }
 

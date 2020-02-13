@@ -7,7 +7,7 @@
             <v-toolbar-title>Reservar Sala</v-toolbar-title>
             <v-spacer />
 
-            <v-btn icon :disabled="formData.id == '' || loading" @click="deletarReuniao">
+            <v-btn icon :disabled="formData.id == '' || loading" @click="deletar">
               <v-icon color="white">mdi-delete</v-icon>
             </v-btn>
           </v-toolbar>
@@ -177,7 +177,7 @@ export default {
       mask: '##:##',
       loading: false,
       ready: false,
-      salas: '',
+      // salas: '',
       error: false,
       errorMessage: '',
       formData: {
@@ -203,7 +203,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['getUser', 'getRequestParams', 'getReuniao', 'getError']),
+    ...mapGetters(['getUser', 'getRequestParams', 'getReuniao', 'getError', 'getSalas']),
     ruleFimData() {
       return [
         v =>
@@ -218,6 +218,9 @@ export default {
           this.formData.nome.length > 3 ||
           'Nome deve ter no minimo 4 caracteres'
       ]
+    },
+    salas(){
+      return this.getSalas
     }
   },
   watch: {
@@ -250,7 +253,7 @@ export default {
     this.listarSalas()
   },
   methods: {
-    ...mapActions(['criarReuniao', ]),
+    ...mapActions(['criarReuniao', 'alterarReuniao', 'deletarReuniao', 'listarSalas']),
     openChanged() {
       // eslint-disable-next-line no-console
       console.log('openChanged')
@@ -265,28 +268,32 @@ export default {
       this.$emit('openChanged', this.open)
     },
     async dadosEvento() {
-      let evento = {
-        id: this.formData.id,
-        nome: this.formData.nome,
-        inicio: this.formData.dataI + ' ' + this.formData.inicio,
-        fim: this.formData.dataF + ' ' + this.formData.fim,
-        sala: this.formData.sala
-      }
       try {
         this.loading = true
 
         this.error = false
-        let parametros = {
+        let reuniaoParams = {
           id: this.formData.id,
           nome: this.formData.nome,
           sala_id: this.formData.sala,
           inicio: this.formData.dataI + 'T' + this.formData.inicio + 'Z',
           fim: this.formData.dataF + 'T' + this.formData.fim + 'Z'
         }
+
+        let params = {
+          reuniao: reuniaoParams,
+          data: {
+            ano: this.dataDia.split('-')[0],
+            mes: this.dataDia.split('-')[1]
+          }
+        }
+
+        // eslint-disable-next-line no-console
+        console.log(params)
         if (this.formData.id == '') {
-          this.criarReuniao(parametros)
+          await this.criarReuniao(params)
         } else {
-          // this.alterarReuniao(parametros)
+          await this.alterarReuniao(params)
         }
 
         this.loading = false
@@ -297,60 +304,67 @@ export default {
         this.formData.sala = ''
         this.dataDia = ''
         this.open = false
-        this.$emit('dadosEvento', evento)
+        this.$emit('dadosEvento')
       } catch (err) {
         this.loading = false
         this.error = true
-        if (this.getError.data.message != undefined) {
-          this.errorMessage = this.getError.data.message.message
-        } else {
-          this.errorMessage = 'Houve um erro, tente novamente mais tarde'
-        }
-      }
-    },
-    async listarSalas() {
-      try {
-        this.loading = true
-        this.error = false
-        const response = await this.$http.get(
-          'sala/listar',
-          this.getRequestParams
-        )
-        let t = await response.json()
-        this.salas = t.salas
-        this.loading = false
         // eslint-disable-next-line no-console
-        console.log(this.salas)
-      } catch (err) {
-        this.loading = false
-        this.error = true
-        if (err.data.message != undefined) {
-          this.errorMessage = err.data.message.message
-        } else {
-          this.errorMessage = 'Houve um erro, tente novamente mais tarde'
-        }
+        console.log(err)
+        // if (this.getError.data.message != undefined) {
+        //   this.errorMessage = this.getError.data.message.message
+        // } else {
+        //   this.errorMessage = 'Houve um erro, tente novamente mais tarde'
+        // }
       }
     },
-    async deletarReuniao() {
+    async listarSala() {
+      // try {
+      //   this.loading = true
+      //   this.error = false
+      //   const response = await this.$http.get(
+      //     'sala/listar',
+      //     this.getRequestParams
+      //   )
+      //   let t = await response.json()
+      //   this.salas = t.salas
+      //   this.loading = false
+      //   // eslint-disable-next-line no-console
+      //   console.log(this.salas)
+      // } catch (err) {
+      //   this.loading = false
+      //   this.error = true
+      //   if (err.data != undefined) {
+      //     this.errorMessage = err.data.message.message
+      //   } else {
+      //     this.errorMessage = 'Houve um erro, tente novamente mais tarde'
+      //   }
+      // }
+    },
+    async deletar() {
       if (this.formData.id != '') {
         // eslint-disable-next-line no-console
-        console.log(this.formData.id)
+        console.log('entrei no deletar')
         try {
           this.loading = true
           this.error = false
 
-          const response = await this.$http.delete(
-            `reuniao/excluir/${this.formData.id}`,
-            this.getRequestParams
-          )
-          let t = await response.json()
+          let params = {
+            id: this.formData.id,
+            data: {
+              ano: this.dataDia.split('-')[0],
+              mes: this.dataDia.split('-')[1]
+            }
+          }
+
+          await this.deletarReuniao(params)
+
           this.$emit('deletar', this.formData.id)
           this.openChanged()
           this.loading = false
         } catch (err) {
           this.loading = false
           this.error = true
-          if (err.data.message != undefined) {
+          if (err.data != undefined) {
             this.errorMessage = err.data.message.message
           } else {
             this.errorMessage = 'Houve um erro, tente novamente mais tarde'

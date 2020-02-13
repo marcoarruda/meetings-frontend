@@ -72,15 +72,21 @@ export default {
       error: false,
       errorMessage: '',
       menu: false,
-      salas: '',
-      reunioes: [],
+      // salas: '',
+      // reunioes: [],
       user: '',
       users: [],
       date: new Date().getFullYear() + '-' + (new Date().getMonth() + 1)
     }
   },
   computed: {
-    ...mapGetters(['getUser', 'getRequestParams'])
+    ...mapGetters(['getUser', 'getRequestParams', 'getRelatorio', 'getSalas']),
+    reunioes() {
+      return this.getRelatorio
+    },
+    salas(){
+      return this.getSalas
+    }
   },
   watch: {
     user() {
@@ -88,7 +94,7 @@ export default {
       this.exibirRelatorio()
     },
     date() {
-      this.loading = false
+      this.loading = true
       this.exibirRelatorio()
     }
   },
@@ -100,9 +106,17 @@ export default {
       nome: this.getUser.attributes.name
     })
     this.listarSalas()
+    let [ano, mes] = this.date.split('-')
+    let params = {
+      user: this.user,
+      ano,
+      mes
+    }
+    this.listarRelatorio(params)
     this.exibirRelatorio()
   },
   methods: {
+    ...mapActions(['listarRelatorio', 'listarSalas']),
     organizeTable() {
       this.itens = []
       for (let i = 0; i < this.salas.length; i++) {
@@ -140,14 +154,12 @@ export default {
     async exibirRelatorio() {
       try {
         this.error = false
-
-        let [ano, mes] = this.date.split('-')
-        const response = await this.$http.get(
-          `reuniao/relatorio/${this.user}/${ano}/${mes}`,
-          this.getRequestParams
-        )
-        let t = await response.json()
-        this.reunioes = t.reunioes
+        // const response = await this.$http.get(
+        //   `reuniao/relatorio/${this.user}/${ano}/${mes}`,
+        //   this.getRequestParams
+        // )
+        // let t = await response.json()
+        // this.reunioes = t.reunioes
         // eslint-disable-next-line no-console
         console.log(this.reunioes)
         this.organizeTable()
@@ -162,25 +174,25 @@ export default {
         }
       }
     },
-    async listarSalas() {
-      try {
-        this.error = false
-        const response = await this.$http.get(
-          'sala/listar',
-          this.getRequestParams
-        )
-        let t = await response.json()
-        this.salas = t.salas
-        // eslint-disable-next-line no-console
-        console.log(this.salas)
-      } catch (err) {
-        this.error = true
-        if (err.data.message != undefined) {
-          this.errorMessage = err.data.message.message
-        } else {
-          this.errorMessage = 'Houve um erro, tente novamente mais tarde'
-        }
-      }
+    async listarSala() {
+      // try {
+      //   this.error = false
+      //   const response = await this.$http.get(
+      //     'sala/listar',
+      //     this.getRequestParams
+      //   )
+      //   let t = await response.json()
+      //   this.salas = t.salas
+      //   // eslint-disable-next-line no-console
+      //   console.log(this.salas)
+      // } catch (err) {
+      //   this.error = true
+      //   if (err.data.message != undefined) {
+      //     this.errorMessage = err.data.message.message
+      //   } else {
+      //     this.errorMessage = 'Houve um erro, tente novamente mais tarde'
+      //   }
+      // }
     },
     yearMonth: function() {
       let year_month = this.date.split('-')

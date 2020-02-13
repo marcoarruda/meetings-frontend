@@ -60,8 +60,8 @@
           :data-dia="dataDia"
           :evento="evento"
           @openChanged="limparDados()"
-          @dadosEvento="open=false; teste=$event; criarEvento(teste)"
-          @deletar="teste=$event; deletarEvento(teste)"
+          @dadosEvento="open=false"
+          @deletar="open=false"
         />
       </v-sheet>
     </v-col>
@@ -174,9 +174,6 @@ export default {
       }))
     }
   },
-  created(){
-    
-  },
   mounted() {
     this.$refs.calendar.checkChange()
   },
@@ -208,7 +205,7 @@ export default {
       this.evento = ''
       this.error = false
     },
-    criarEvento(teste) {
+    criarEvento() {
       // do nothing
     },
     deletarEvento(id) {
