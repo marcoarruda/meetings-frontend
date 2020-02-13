@@ -75,7 +75,7 @@ const mutations = {
   async mListarReunioes(state, params){
     try {
       let reunioes = await api.listarReuniao(params.ano, params.mes)
-      state.reunioes = await reunioes
+      state.reunioes = await reunioes.reunioes
       // eslint-disable-next-line no-console
       console.log(state.reunioes)
     } catch (error) {

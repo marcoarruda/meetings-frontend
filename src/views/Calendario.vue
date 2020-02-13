@@ -97,7 +97,7 @@ export default {
     selectedEvent: {},
     selectedElement: null,
     selectedOpen: false,
-    events: [],
+    // events: [],
     colors: [
       'blue',
       'indigo',
@@ -153,6 +153,25 @@ export default {
         timeZone: 'UTC',
         month: 'long'
       })
+    },
+    events() {
+      return this.getReunioes.map(r => ({
+        id: r.id,
+        sala: r.SalaId,
+        name: r.nome,
+        start:
+          r.inicio.split('T')[0] +
+          ' ' +
+          r.inicio.split('T')[1].split(':00.000Z')[0],
+        end:
+          r.fim.split('T')[0] +
+          ' ' +
+          r.fim.split('T')[1].split(':00.000Z')[0],
+        color:
+          this.getUser.username == r.UserId
+            ? this.colors[0]
+            : this.colors[6]
+      }))
     }
   },
   created(){
@@ -166,45 +185,6 @@ export default {
     viewDay({ date }) {
       this.focus = date
       this.type = 'day'
-    },
-    async listarReuniao() {
-      try {
-        this.error = false
-        // const response = await this.$http.get(
-        //   'reuniao/listar/' + this.start.year + '/' + this.start.month,
-        //   this.getRequestParams
-        // )
-        let t = this.getReunioes
-        // eslint-disable-next-line no-console
-        console.log(t)
-        this.events = []
-        for (let i = 0; i < t.reunioes.length; i++) {
-          this.events.push({
-            id: t.reunioes[i].id,
-            sala: t.reunioes[i].SalaId,
-            name: t.reunioes[i].nome,
-            start:
-              t.reunioes[i].inicio.split('T')[0] +
-              ' ' +
-              t.reunioes[i].inicio.split('T')[1].split(':00.000Z')[0],
-            end:
-              t.reunioes[i].fim.split('T')[0] +
-              ' ' +
-              t.reunioes[i].fim.split('T')[1].split(':00.000Z')[0],
-            color:
-              this.getUser.username == t.reunioes[i].UserId
-                ? this.colors[0]
-                : this.colors[6]
-          })
-        }
-      } catch (err) {
-        this.error = true
-        if (err.data != undefined) {
-          this.errorMessage = err.data.message.message
-        } else {
-          this.errorMessage = 'Houve um erro, tente novamente mais tarde'
-        }
-      }
     },
     openFormCriar({ date }) {
       this.dataDia = date
@@ -229,31 +209,10 @@ export default {
       this.error = false
     },
     criarEvento(teste) {
-      let evento = this.events.find(e => e.id == teste.id)
-      if (evento != undefined) {
-        evento.name = this.teste.nome
-        evento.sala = this.teste.sala
-        evento.start = this.teste.inicio
-        evento.end = this.teste.fim
-        evento.color = this.colors[0]
-      } else {
-        this.events.push({
-          id: this.teste.id,
-          sala: this.teste.sala,
-          name: this.teste.nome,
-          start: this.teste.inicio,
-          end: this.teste.fim,
-          color: this.colors[0]
-        })
-      }
-      this.listarReuniao()
+      // do nothing
     },
     deletarEvento(id) {
-      let evento = this.events.filter(function(e) {
-        return e.id != id
-      })
-      this.events = evento
-      this.listarReuniao()
+      // do nothing
     },
     getEventColor(event) {
       return event.color
@@ -293,7 +252,7 @@ export default {
       this.listarReunioes(params)
       // eslint-disable-next-line no-console
       console.log('pos listarReunioes')
-      this.listarReuniao()
+      // this.listarReuniao()
     },
     nth(d) {
       return d > 3 && d < 21
