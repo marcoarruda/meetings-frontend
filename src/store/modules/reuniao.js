@@ -14,6 +14,8 @@ const getters = {
     return state.error
   },
   getReunioes(state){
+    // eslint-disable-next-line no-console
+    console.log('entrei getReunioes')
     return state.reunioes
   }
 }
@@ -32,6 +34,9 @@ const mutations = {
     try {
       let reuniao = await api.agendarReuniao(nome, sala_id, inicio, fim)
       state.reuniao = reuniao
+      state.reunioes.push(reuniao)
+      // eslint-disable-next-line no-console
+      console.log('nao entrei no catch')
     } catch (ex) {
       // eslint-disable-next-line no-console
       console.log(ex)
@@ -67,6 +72,16 @@ const mutations = {
       state.error = ex
     })
   },
+  async mListarReunioes(state, params){
+    try {
+      let reunioes = await api.listarReuniao(params.ano, params.mes)
+      state.reunioes = await reunioes
+      // eslint-disable-next-line no-console
+      console.log(state.reunioes)
+    } catch (error) {
+      state.error = error
+    }
+  }
 }
 
 const actions = {
@@ -78,6 +93,9 @@ const actions = {
   },
   deletarReuniao(context, id){
     context.commit('mDeletarReuniao', id)
+  },
+  async listarReunioes(context, params){
+    await context.commit('mListarReunioes',params)
   },
   setReuniao(context, reuniao){
     context.commit('mSetReuniao', reuniao)

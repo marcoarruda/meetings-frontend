@@ -285,30 +285,8 @@ export default {
         }
         if (this.formData.id == '') {
           this.criarReuniao(parametros)
-          if(this.getError != null){
-            // eslint-disable-next-line no-console
-            console.log(this.getError)
-            throw new Error(this.getError)
-          }
-          let reuniaoCriada = this.getReuniao
-          // const response = await this.$http.post(
-          //   'reuniao/agendar',
-          //   parametros,
-          //   this.getRequestParams
-          // )
-          // let t = await response.json()
-          // eslint-disable-next-line no-console
-          // console.log(reuniaoCriada)
-          evento.id = reuniaoCriada.reuniao_id
         } else {
-          // const response = await this.$http.put(
-          //   'reuniao/alterar',
-          //   parametros,
-          //   this.getRequestParams
-          // )
-          // let t = await response.json()
-          // eslint-disable-next-line no-console
-          // console.log(t)
+          // this.alterarReuniao(parametros)
         }
 
         this.loading = false
@@ -323,8 +301,8 @@ export default {
       } catch (err) {
         this.loading = false
         this.error = true
-        if (err.data.message != undefined) {
-          this.errorMessage = err.data.message.message
+        if (this.getError.data.message != undefined) {
+          this.errorMessage = this.getError.data.message.message
         } else {
           this.errorMessage = 'Houve um erro, tente novamente mais tarde'
         }

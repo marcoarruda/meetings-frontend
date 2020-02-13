@@ -6,7 +6,7 @@ export default {
     let params = { nome, sala_id, inicio, fim }
     let reuniao = null
     try {
-      let reuniao = await Vue.http.post('reuniao/agendar',
+      reuniao = await Vue.http.post('reuniao/agendar',
         params,
         store.getters.getRequestParams
       )
@@ -17,6 +17,7 @@ export default {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.log(error)
+      reuniao = error
     }
     return reuniao
   },
@@ -51,18 +52,20 @@ export default {
     }
   },
   async listarReuniao(ano, mes){
+    let reunioes = []
     try {
       let response = await Vue.http.get(`reuniao/listar/${ano}/${mes}`,
         store.getters.getRequestParams
       )
-      let reuniao = response
+      reunioes = await response.json()
       // eslint-disable-next-line no-console
-      console.log(reuniao)
+      console.log(reunioes)
 
     } catch (error) {
       // eslint-disable-next-line no-console
       console.log(error)
     }
+    return reunioes
   },
   async listarRelatorio(user, ano, mes){
     try {

@@ -119,7 +119,7 @@ export default {
     ]
   }),
   computed: {
-    ...mapGetters(['getUser', 'getRequestParams']),
+    ...mapGetters(['getUser', 'getRequestParams', 'getReunioes']),
     title() {
       const { start, end } = this
       if (!start || !end) {
@@ -155,25 +155,28 @@ export default {
       })
     }
   },
+  created(){
+    
+  },
   mounted() {
     this.$refs.calendar.checkChange()
   },
   methods: {
+    ...mapActions(['listarReunioes']),
     viewDay({ date }) {
       this.focus = date
       this.type = 'day'
     },
     async listarReuniao() {
-
       try {
         this.error = false
-        const response = await this.$http.get(
-          'reuniao/listar/' + this.start.year + '/' + this.start.month,
-          this.getRequestParams
-        )
-        let t = await response.json()
+        // const response = await this.$http.get(
+        //   'reuniao/listar/' + this.start.year + '/' + this.start.month,
+        //   this.getRequestParams
+        // )
+        let t = this.getReunioes
         // eslint-disable-next-line no-console
-        console.log(this.getUser)
+        console.log(t)
         this.events = []
         for (let i = 0; i < t.reunioes.length; i++) {
           this.events.push({
@@ -196,7 +199,7 @@ export default {
         }
       } catch (err) {
         this.error = true
-        if (err.data.message != undefined) {
+        if (err.data != undefined) {
           this.errorMessage = err.data.message.message
         } else {
           this.errorMessage = 'Houve um erro, tente novamente mais tarde'
@@ -245,8 +248,8 @@ export default {
       }
       this.listarReuniao()
     },
-    deletarEvento(id){
-      let evento = this.events.filter(function(e){
+    deletarEvento(id) {
+      let evento = this.events.filter(function(e) {
         return e.id != id
       })
       this.events = evento
@@ -283,6 +286,13 @@ export default {
     updateRange({ start, end }) {
       this.start = start
       this.end = end
+      let params = {
+        ano: this.start.year,
+        mes: this.start.month
+      }
+      this.listarReunioes(params)
+      // eslint-disable-next-line no-console
+      console.log('pos listarReunioes')
       this.listarReuniao()
     },
     nth(d) {
