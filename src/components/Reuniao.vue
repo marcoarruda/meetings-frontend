@@ -14,8 +14,8 @@
           <v-card-text>
             <v-container>
               <v-row>
-                <v-col v-show="error" cols="12" md="12" lg="12" xl="12">
-                  <v-alert dense outlined type="error">{{ errorMessage }}</v-alert>
+                <v-col v-show="erro != ''" cols="12" md="12" lg="12" xl="12">
+                  <v-alert dense outlined type="error">{{ erro }}</v-alert>
                 </v-col>
                 <v-col cols="12" sm="6">
                   <v-text-field
@@ -177,6 +177,7 @@ export default {
       mask: '##:##',
       loading: false,
       ready: false,
+      salvar: '',
       // salas: '',
       error: false,
       errorMessage: '',
@@ -203,7 +204,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['getUser', 'getRequestParams', 'getReuniao', 'getError', 'getSalas']),
+    ...mapGetters(['getUser', 'getRequestParams', 'getErrorForm', 'getSalas']),
     ruleFimData() {
       return [
         v =>
@@ -221,9 +222,17 @@ export default {
     },
     salas(){
       return this.getSalas
+    },
+    erro(){
+      return this.getErrorForm
     }
   },
   watch: {
+    erro(){
+      if(this.erro == 'OK' && this.salvar){
+        this.openChanged()
+      }
+    },
     dataDia() {
       if (this.dataDia != '') {
         this.formData.dataI = this.dataDia
@@ -250,14 +259,19 @@ export default {
   },
   mounted() {
     this.ready = true
+    this.salvar = false
     this.listarSalas()
+    this.setErrorForm()
   },
   methods: {
-    ...mapActions(['criarReuniao', 'alterarReuniao', 'deletarReuniao', 'listarSalas']),
+    ...mapActions(['criarReuniao', 'alterarReuniao', 'deletarReuniao', 'listarSalas', 'setErrorForm']),
     openChanged() {
       // eslint-disable-next-line no-console
-      console.log('openChanged')
-      this.error = false
+      console.log(this.erro)
+      // eslint-disable-next-line no-console
+      console.log(this.open)
+      this.setErrorForm()
+      this.salvar = false
       this.formData.id = ''
       this.formData.nome = ''
       this.formData.fim = null
@@ -288,8 +302,6 @@ export default {
           }
         }
 
-        // eslint-disable-next-line no-console
-        console.log(params)
         if (this.formData.id == '') {
           await this.criarReuniao(params)
         } else {
@@ -297,24 +309,19 @@ export default {
         }
 
         this.loading = false
-        this.formData.id = ''
-        this.formData.nome = ''
-        this.formData.fim = null
-        this.formData.inicio = null
-        this.formData.sala = ''
-        this.dataDia = ''
-        this.open = false
-        this.$emit('dadosEvento')
+        this.salvar = true
+        // this.formData.id = ''
+        // this.formData.nome = ''
+        // this.formData.fim = null
+        // this.formData.inicio = null
+        // this.formData.sala = ''
+        // this.dataDia = ''
+        // this.open = false
+        // this.$emit('dadosEvento')
+
       } catch (err) {
         this.loading = false
         this.error = true
-        // eslint-disable-next-line no-console
-        console.log(err)
-        // if (this.getError.data.message != undefined) {
-        //   this.errorMessage = this.getError.data.message.message
-        // } else {
-        //   this.errorMessage = 'Houve um erro, tente novamente mais tarde'
-        // }
       }
     },
     async listarSala() {
@@ -346,7 +353,6 @@ export default {
         console.log('entrei no deletar')
         try {
           this.loading = true
-          this.error = false
 
           let params = {
             id: this.formData.id,
@@ -358,9 +364,11 @@ export default {
 
           await this.deletarReuniao(params)
 
-          this.$emit('deletar', this.formData.id)
-          this.openChanged()
+          // this.$emit('deletar')
+          // this.openChanged()
           this.loading = false
+          this.loading = false
+          this.salvar = true
         } catch (err) {
           this.loading = false
           this.error = true

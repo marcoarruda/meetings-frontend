@@ -5,15 +5,27 @@ const state = {
   reunioes: [],
   relatorio: [],
   salas: [],
-  error: null
+  error: null,
+  errorForm: null,
+  open: false,
 }
 
 const getters = {
   getReuniao(state){
     return state.reuniao
   },
+  getOpen(state){
+    return state.open
+  },
   getError(state) {
+    // eslint-disable-next-line no-console
+    console.log('entrei getError')
     return state.error
+  },
+  getErrorForm(state) {
+    // eslint-disable-next-line no-console
+    console.log('entrei getError')
+    return state.errorForm
   },
   getReunioes(state){
     // eslint-disable-next-line no-console
@@ -33,69 +45,84 @@ const getters = {
 }
 
 const mutations = {
-  async mCriarReuniao(state, reuniao){
-    let nome = reuniao.nome
-    let sala_id = reuniao.sala_id
-    let inicio = reuniao.inicio
-    let fim = reuniao.fim
+  async mCriarReuniao(state, params){
+    let nome = params.reuniao.nome
+    let sala_id = params.reuniao.sala_id
+    let inicio = params.reuniao.inicio
+    let fim = params.reuniao.fim
+    let ano = params.data.ano
+    let mes = params.data.mes
 
     try {
       let resposta = await api.agendarReuniao(nome, sala_id, inicio, fim)
       state.reuniao = resposta
+      let reunioes = await api.listarReuniao(ano, mes)
+      state.reunioes = reunioes.reunioes
+      state.errorForm = 'OK'
+
+    } catch (error) {
+      state.errorForm = error.toString().split(': ')[1]
       // eslint-disable-next-line no-console
-      console.log('nao entrei no catch')
-    } catch (ex) {
-      // eslint-disable-next-line no-console
-      console.log(ex)
-      state.error = ex
+      console.log(state.error)
+      // throw new Error(error)
+
     }
   },
-  async mAlterarReuniao(state, reuniao){
-    let id = reuniao.id
-    let nome = reuniao.nome
-    let sala_id = reuniao.sala_id
-    let inicio = reuniao.inicio
-    let fim = reuniao.fim
+  async mAlterarReuniao(state, params){
+    let id = params.reuniao.id
+    let nome = params.reuniao.nome
+    let sala_id = params.reuniao.sala_id
+    let inicio = params.reuniao.inicio
+    let fim = params.reuniao.fim
+    let ano = params.data.ano
+    let mes = params.data.mes
 
     try {
       let resposta = await api.alterarReuniao(id, nome, sala_id, inicio, fim)
       state.reuniao = resposta
-    } catch (ex) {
-      // eslint-disable-next-line no-console
-      console.log(ex)
-      state.error = ex
+      let reunioes = await api.listarReuniao(ano, mes)
+      state.reunioes = reunioes.reunioes
+      state.errorForm = 'OK'
+    } catch (error) {
+      state.errorForm = error.toString().split(': ')[1]
+
     }
   },
-  mDeletarReuniao(state, id){
-    api.deletarReuniao(id).then((resposta) => {
+  async mDeletarReuniao(state, params){
+    try {
+      let resposta = await api.deletarReuniao(params.id)
       state.reuniao = resposta
-      // eslint-disable-next-line no-console
-      console.log(state.reuniao)
-    }).catch(ex => {
-      // eslint-disable-next-line no-console
-      console.log(ex)
-      state.error = ex
-    })
+      let reunioes = await api.listarReuniao(params.data.ano, params.data.mes)
+      state.reunioes = reunioes.reunioes
+      state.errorForm = 'OK'
+    } catch (error) {
+      state.errorForm = error.toString().split(': ')[1]
+
+    }
   },
   async mListarReunioes(state, params){
     try {
       let reunioes = await api.listarReuniao(params.ano, params.mes)
       state.reunioes = await reunioes.reunioes
+      state.error = ''
       // eslint-disable-next-line no-console
       // console.log(state.reunioes)
     } catch (error) {
-      state.error = error
+      state.error = error.toString().split(': ')[1]
+      // eslint-disable-next-line no-console
+      console.log(error)
+
     }
   },
   async mListarRelatorio(state, params){
     try {
       let relatorio = await api.listarRelatorio(params.user, params.ano, params.mes)
       state.relatorio = await relatorio.reunioes
-      // eslint-disable-next-line no-console
-      console.log(state.relatorio)
+      state.error = ''
 
     } catch (error) {
-      state.error = error
+      state.error = error.toString().split(': ')[1]
+
     }
   },
   async mListarSalas(state){
@@ -106,25 +133,30 @@ const mutations = {
       console.log(state.salas)
 
     } catch (error) {
-      state.error = error
+      state.error = error.toString().split(': ')[1]
+
     }
+  },
+  mSetError(state){
+    state.error = ''
+  },
+  mSetErrorForm(state){
+    state.errorForm = ''
+  },
+  mSetOpen(state, value){
+    state.open = value
   }
 }
 
 const actions = {
   async criarReuniao(context, params){
-    await context.commit('mCriarReuniao', params.reuniao)
-    await context.commit('mListarReunioes', params.data)
+    await context.commit('mCriarReuniao', params)
   },
   async alterarReuniao(context, params){
-    await context.commit('mAlterarReuniao', params.reuniao)
-    await context.commit('mListarReunioes', params.data)
+    await context.commit('mAlterarReuniao', params)
   },
   async deletarReuniao(context, params){
-    // eslint-disable-next-line no-console
-    console.log(params)
-    await context.commit('mDeletarReuniao', params.id)
-    await context.commit('mListarReunioes', params.data)
+    await context.commit('mDeletarReuniao', params)
   },
   async listarReunioes(context, params){
     await context.commit('mListarReunioes',params)
@@ -134,6 +166,15 @@ const actions = {
   },
   async listarSalas(context){
     await context.commit('mListarSalas')
+  },
+  setError(context){
+    context.commit('mSetError')
+  },
+  setErrorForm(context){
+    context.commit('mSetErrorForm')
+  },
+  setOpen(context, value){
+    context.commit('mSetOpen', value)
   }
 }
 

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-alert v-show="error" dense outlined type="error">{{ errorMessage }}</v-alert>
+    <v-alert v-show="erro != '' " dense outlined type="error">{{ erro }}</v-alert>
     <v-row>
       <v-col cols="8" sm="8" md="3" lg="2" xl="4" align="center">
         <v-select
@@ -67,10 +67,7 @@ export default {
         { text: 'Sala', value: 'sala' },
         { text: 'Tempo utilizado', value: 'tempo' }
       ],
-      itens: [],
       loading: false,
-      error: false,
-      errorMessage: '',
       menu: false,
       // salas: '',
       // reunioes: [],
@@ -80,22 +77,42 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['getUser', 'getRequestParams', 'getRelatorio', 'getSalas']),
-    reunioes() {
-      return this.getRelatorio
+    ...mapGetters({
+      getUser: 'getUser',
+      getRequestParams: 'getRequestParams',
+      reunioes: 'getRelatorio',
+      salas: 'getSalas',
+      erro: 'getError'
+    }),
+    itens() {
+      return this.organizeTable()
     },
-    salas(){
-      return this.getSalas
-    }
+    // ...mapGetters(['getUser', 'getRequestParams', 'getRelatorio', 'getSalas', 'getError']),
+    // reunioes() {
+    //   return this.getRelatorio
+    // },
+    // salas() {
+    //   return this.getSalas
+    // },
+    // erro(){
+    //   return this.getError
+    // }
   },
   watch: {
     user() {
       this.loading = true
-      this.exibirRelatorio()
+      this.organizeTable()
     },
     date() {
       this.loading = true
-      this.exibirRelatorio()
+      let [ano, mes] = this.date.split('-')
+      let params = {
+        user: this.user,
+        ano,
+        mes
+      }
+      this.listarRelatorio(params)
+      this.organizeTable()
     }
   },
   mounted() {
@@ -113,12 +130,12 @@ export default {
       mes
     }
     this.listarRelatorio(params)
-    this.exibirRelatorio()
+    this.organizeTable()
   },
   methods: {
     ...mapActions(['listarRelatorio', 'listarSalas']),
     organizeTable() {
-      this.itens = []
+      let itens = []
       for (let i = 0; i < this.salas.length; i++) {
         let duracao = 0
         for (let j = 0; j < this.reunioes.length; j++) {
@@ -133,11 +150,13 @@ export default {
           }
         }
         duracao = this.convertTempo(duracao)
-        this.itens.push({
+        itens.push({
           sala: this.salas[i].nome,
           tempo: duracao
         })
       }
+      this.loading = false
+      return itens
     },
     calculaTempo(inicio, fim) {
       return new Date(fim).getTime() - new Date(inicio).getTime()
@@ -152,47 +171,10 @@ export default {
       return horas + ':' + minutos + ':' + segundos
     },
     async exibirRelatorio() {
-      try {
-        this.error = false
-        // const response = await this.$http.get(
-        //   `reuniao/relatorio/${this.user}/${ano}/${mes}`,
-        //   this.getRequestParams
-        // )
-        // let t = await response.json()
-        // this.reunioes = t.reunioes
-        // eslint-disable-next-line no-console
-        console.log(this.reunioes)
-        this.organizeTable()
-        this.loading = false
-      } catch (err) {
-        this.loading = false
-        this.error = true
-        if (err.data.message != undefined) {
-          this.errorMessage = err.data.message.message
-        } else {
-          this.errorMessage = 'Houve um erro, tente novamente mais tarde'
-        }
-      }
+
     },
     async listarSala() {
-      // try {
-      //   this.error = false
-      //   const response = await this.$http.get(
-      //     'sala/listar',
-      //     this.getRequestParams
-      //   )
-      //   let t = await response.json()
-      //   this.salas = t.salas
-      //   // eslint-disable-next-line no-console
-      //   console.log(this.salas)
-      // } catch (err) {
-      //   this.error = true
-      //   if (err.data.message != undefined) {
-      //     this.errorMessage = err.data.message.message
-      //   } else {
-      //     this.errorMessage = 'Houve um erro, tente novamente mais tarde'
-      //   }
-      // }
+
     },
     yearMonth: function() {
       let year_month = this.date.split('-')

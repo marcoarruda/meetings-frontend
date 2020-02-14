@@ -13,13 +13,15 @@ export default {
       reuniao =  await response.json()
       // eslint-disable-next-line no-console
       console.log(reuniao)
+      return reuniao
 
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.log(error)
-      reuniao = error
+      let erro = 'Houve um erro, tente novamente mais tarde'
+      if(error.data != '' ){
+        erro = error.data.message.message
+      }
+      throw new Error(erro)
     }
-    return reuniao
   },
   async alterarReuniao(id, nome, sala_id, inicio, fim) {
     let params = { id, nome, sala_id, inicio, fim }
@@ -32,13 +34,15 @@ export default {
       reuniao =  await response.json()
       // eslint-disable-next-line no-console
       console.log(reuniao)
+      return reuniao
 
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.log(error)
-      reuniao = error
+      let erro = 'Houve um erro, tente novamente mais tarde'
+      if(error.data != '' ){
+        erro = error.data.message.message
+      }
+      throw new Error(erro)
     }
-    return reuniao
   },
   async deletarReuniao(id) {
     let reuniaoDeletada = null
@@ -49,13 +53,15 @@ export default {
       reuniaoDeletada =  await response.json()
       // eslint-disable-next-line no-console
       console.log(reuniaoDeletada)
+      return reuniaoDeletada
 
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.log(error)
-      reuniaoDeletada = error
+      let erro = 'Houve um erro, tente novamente mais tarde'
+      if(error.data != '' ){
+        erro = error.data.message.message
+      }
+      throw new Error(erro)
     }
-    return reuniaoDeletada
   },
   async listarReuniao(ano, mes){
     let reunioes = []
@@ -64,14 +70,17 @@ export default {
         store.getters.getRequestParams
       )
       reunioes = await response.json()
-      // eslint-disable-next-line no-console
-      console.log(reunioes)
+      return reunioes
 
     } catch (error) {
       // eslint-disable-next-line no-console
       console.log(error)
+      let erro = 'Houve um erro, tente novamente mais tarde'
+      if(error.data != '' ){
+        erro = error.data.message.message
+      }
+      throw new Error(erro)
     }
-    return reunioes
   },
   async listarRelatorio(user, ano, mes){
     let relatorio = []
@@ -83,11 +92,15 @@ export default {
       // eslint-disable-next-line no-console
       console.log(relatorio)
 
+      return relatorio
+
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.log(error)
+      let erro = 'Houve um erro, tente novamente mais tarde'
+      if(error.data != '' ){
+        erro = error.data.message.message
+      }
+      throw new Error(erro)
     }
-    return relatorio
   },
   async listarSalas(){
     let salas = []
@@ -98,11 +111,14 @@ export default {
       salas = await response.json()
       // eslint-disable-next-line no-console
       console.log(salas)
+      return salas
 
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.log(error)
+      let erro = 'Houve um erro, tente novamente mais tarde'
+      if(error.data != '' ){
+        erro = error.data.message.message
+      }
+      throw new Error(erro)
     }
-    return salas
   },
 }

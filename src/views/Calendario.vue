@@ -39,7 +39,7 @@
         </v-toolbar>
       </v-sheet>
       <v-sheet height="600">
-        <v-alert v-show="error" dense outlined type="error">{{ errorMessage }}</v-alert>
+        <v-alert v-show="erro != ''" dense outlined type="error">{{ erro }}</v-alert>
         <v-calendar
           ref="calendar"
           v-model="focus"
@@ -60,8 +60,6 @@
           :data-dia="dataDia"
           :evento="evento"
           @openChanged="limparDados()"
-          @dadosEvento="open=false"
-          @deletar="open=false"
         />
       </v-sheet>
     </v-col>
@@ -119,7 +117,7 @@ export default {
     ]
   }),
   computed: {
-    ...mapGetters(['getUser', 'getRequestParams', 'getReunioes']),
+    ...mapGetters(['getUser', 'getRequestParams', 'getReunioes', 'getError']),
     title() {
       const { start, end } = this
       if (!start || !end) {
@@ -153,6 +151,9 @@ export default {
         timeZone: 'UTC',
         month: 'long'
       })
+    },
+    erro(){
+      return this.getError
     },
     events() {
       return this.getReunioes.map(r => ({
