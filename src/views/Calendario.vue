@@ -103,7 +103,6 @@ export default {
   computed: {
     ...mapGetters([
       'getUser',
-      'getRequestParams',
       'getReunioes',
       'getError',
       'getLoading'
