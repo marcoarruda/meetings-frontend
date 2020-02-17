@@ -79,7 +79,6 @@ export default {
     formEvento: { },
     dataDia: '',
     open: false,
-    teste: 'teste',
     focus: '',
     today: new Date().toISOString().split('T')[0],
     type: 'month',
@@ -91,9 +90,6 @@ export default {
     },
     start: null,
     end: null,
-    selectedEvent: {},
-    selectedElement: null,
-    selectedOpen: false,
     colors: [
       'blue',
       'indigo',
@@ -103,16 +99,6 @@ export default {
       'orange',
       'grey darken-1'
     ],
-    names: [
-      'Meeting',
-      'Holiday',
-      'PTO',
-      'Travel',
-      'Event',
-      'Birthday',
-      'Conference',
-      'Party'
-    ]
   }),
   computed: {
     ...mapGetters([
@@ -221,14 +207,16 @@ export default {
     next() {
       this.$refs.calendar.next()
     },
-    updateRange({ start, end }) {
+    async updateRange({ start, end }) {
       this.start = start
       this.end = end
       let params = {
         ano: this.start.year,
         mes: this.start.month
       }
-      this.listarReunioes(params)
+      await this.listarReunioes(params)
+      // eslint-disable-next-line no-console
+      console.log('apos listar')
     },
     nth(d) {
       return d > 3 && d < 21
