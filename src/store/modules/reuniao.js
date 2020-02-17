@@ -98,11 +98,11 @@ const mutations = {
       let reunioes = await api.listarReuniao(params.ano, params.mes)
       state.reunioes = await reunioes.reunioes
       state.error = ''
-      state.loading = false
     } catch (error) {
       state.error = error.toString().split(': ')[1]
+    } finally {
       state.loading = false
-
+      // chamar mSetLoading ?
     }
   },
   async mListarRelatorio(state, params){
