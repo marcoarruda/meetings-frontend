@@ -2,6 +2,7 @@
 <template>
   <v-row class="fill-height">
     <v-col>
+      <!-- Menu superior -->
       <v-sheet height="64">
         <v-toolbar flat color="white">
           <v-btn outlined class="mr-4" color="grey darken-2" @click="setToday">Today</v-btn>
@@ -37,6 +38,8 @@
           </v-menu>
         </v-toolbar>
       </v-sheet>
+
+      <!-- Calendario -->
       <v-sheet height="600">
         <v-progress-linear v-show="loading" indeterminate color="light-blue" />
         <v-alert v-show="erro != ''" dense outlined type="error">{{ erro }}</v-alert>
@@ -56,8 +59,10 @@
           @change="updateRange"
         />
         <!-- eslint-disable-next-line vue/attribute-hyphenation -->
-        <app-form :open="open" :data-dia="dataDia" :evento="evento" @openChanged="limparDados()" />
       </v-sheet>
+
+      <!-- Form -->
+      <app-form :open="open" :data-dia="dataDia" :evento="formEvento" @openChanged="limparDados()" />
     </v-col>
   </v-row>
 </template>
@@ -71,7 +76,7 @@ export default {
     appForm: ReuniaoForm
   },
   data: () => ({
-    evento: '',
+    formEvento: { },
     dataDia: '',
     open: false,
     teste: 'teste',
@@ -188,7 +193,7 @@ export default {
       this.open = true
     },
     openFormEditar({ event }) {
-      this.evento = {
+      this.formEvento = {
         id: event.id,
         sala: event.sala,
         dataI: event.start.split(' ')[0],
@@ -202,7 +207,7 @@ export default {
     limparDados() {
       this.dataDia = ''
       this.open = false
-      this.evento = ''
+      this.formEvento = {}
     },
     criarEvento() {
       // do nothing
