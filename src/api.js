@@ -11,8 +11,6 @@ export default {
         store.getters.getRequestParams
       )
       reuniao =  await response.json()
-      // eslint-disable-next-line no-console
-      console.log(reuniao)
       return reuniao
 
     } catch (error) {
@@ -32,8 +30,6 @@ export default {
         store.getters.getRequestParams
       )
       reuniao =  await response.json()
-      // eslint-disable-next-line no-console
-      console.log(reuniao)
       return reuniao
 
     } catch (error) {
@@ -51,8 +47,6 @@ export default {
         store.getters.getRequestParams
       )
       reuniaoDeletada =  await response.json()
-      // eslint-disable-next-line no-console
-      console.log(reuniaoDeletada)
       return reuniaoDeletada
 
     } catch (error) {
@@ -73,8 +67,6 @@ export default {
       return reunioes
 
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.log(error)
       let erro = 'Houve um erro, tente novamente mais tarde'
       if(error.data != '' ){
         erro = error.data.message.message
@@ -89,8 +81,6 @@ export default {
         store.getters.getRequestParams
       )
       relatorio = await response.json()
-      // eslint-disable-next-line no-console
-      console.log(relatorio)
 
       return relatorio
 
@@ -109,8 +99,6 @@ export default {
         store.getters.getRequestParams
       )
       salas = await response.json()
-      // eslint-disable-next-line no-console
-      console.log(salas)
       return salas
 
     } catch (error) {

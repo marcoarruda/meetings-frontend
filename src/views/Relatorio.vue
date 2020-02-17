@@ -67,10 +67,7 @@ export default {
         { text: 'Sala', value: 'sala' },
         { text: 'Tempo utilizado', value: 'tempo' }
       ],
-      loading: false,
       menu: false,
-      // salas: '',
-      // reunioes: [],
       user: '',
       users: [],
       date: new Date().getFullYear() + '-' + (new Date().getMonth() + 1)
@@ -82,29 +79,20 @@ export default {
       getRequestParams: 'getRequestParams',
       reunioes: 'getRelatorio',
       salas: 'getSalas',
-      erro: 'getError'
+      erro: 'getError',
+      loading: 'getLoading'
     }),
     itens() {
       return this.organizeTable()
-    },
-    // ...mapGetters(['getUser', 'getRequestParams', 'getRelatorio', 'getSalas', 'getError']),
-    // reunioes() {
-    //   return this.getRelatorio
-    // },
-    // salas() {
-    //   return this.getSalas
-    // },
-    // erro(){
-    //   return this.getError
-    // }
+    }
   },
   watch: {
     user() {
-      this.loading = true
+      this.setLoading(true)
       this.organizeTable()
     },
     date() {
-      this.loading = true
+      this.setLoading(true)
       let [ano, mes] = this.date.split('-')
       let params = {
         user: this.user,
@@ -116,7 +104,7 @@ export default {
     }
   },
   mounted() {
-    this.loading = true
+    this.setLoading(true)
     this.user = this.getUser.username
     this.users.push({
       id: this.getUser.username,
@@ -133,7 +121,7 @@ export default {
     this.organizeTable()
   },
   methods: {
-    ...mapActions(['listarRelatorio', 'listarSalas']),
+    ...mapActions(['listarRelatorio', 'listarSalas', 'setLoading']),
     organizeTable() {
       let itens = []
       for (let i = 0; i < this.salas.length; i++) {
@@ -155,7 +143,6 @@ export default {
           tempo: duracao
         })
       }
-      this.loading = false
       return itens
     },
     calculaTempo(inicio, fim) {

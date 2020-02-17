@@ -175,12 +175,8 @@ export default {
   data() {
     return {
       mask: '##:##',
-      loading: false,
       ready: false,
       salvar: '',
-      // salas: '',
-      error: false,
-      errorMessage: '',
       formData: {
         id: '',
         inicio: null,
@@ -204,7 +200,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['getUser', 'getRequestParams', 'getErrorForm', 'getSalas']),
+    ...mapGetters(['getUser', 'getRequestParams', 'getErrorForm', 'getSalas', 'getLoading']),
     ruleFimData() {
       return [
         v =>
@@ -225,6 +221,9 @@ export default {
     },
     erro(){
       return this.getErrorForm
+    },
+    loading(){
+      return this.getLoading
     }
   },
   watch: {
@@ -264,12 +263,8 @@ export default {
     this.setErrorForm()
   },
   methods: {
-    ...mapActions(['criarReuniao', 'alterarReuniao', 'deletarReuniao', 'listarSalas', 'setErrorForm']),
+    ...mapActions(['criarReuniao', 'alterarReuniao', 'deletarReuniao', 'listarSalas', 'setErrorForm', 'setLoading']),
     openChanged() {
-      // eslint-disable-next-line no-console
-      console.log(this.erro)
-      // eslint-disable-next-line no-console
-      console.log(this.open)
       this.setErrorForm()
       this.salvar = false
       this.formData.id = ''
@@ -282,102 +277,49 @@ export default {
       this.$emit('openChanged', this.open)
     },
     async dadosEvento() {
-      try {
-        this.loading = true
+      this.setLoading(true)
+      let reuniaoParams = {
+        id: this.formData.id,
+        nome: this.formData.nome,
+        sala_id: this.formData.sala,
+        inicio: this.formData.dataI + 'T' + this.formData.inicio + 'Z',
+        fim: this.formData.dataF + 'T' + this.formData.fim + 'Z'
+      }
 
-        this.error = false
-        let reuniaoParams = {
-          id: this.formData.id,
-          nome: this.formData.nome,
-          sala_id: this.formData.sala,
-          inicio: this.formData.dataI + 'T' + this.formData.inicio + 'Z',
-          fim: this.formData.dataF + 'T' + this.formData.fim + 'Z'
+      let params = {
+        reuniao: reuniaoParams,
+        data: {
+          ano: this.dataDia.split('-')[0],
+          mes: this.dataDia.split('-')[1]
         }
+      }
+
+      if (this.formData.id == '') {
+        await this.criarReuniao(params)
+      } else {
+        await this.alterarReuniao(params)
+      }
+
+      this.salvar = true
+    },
+    async listarSala() {
+
+    },
+    async deletar() {
+      this.setLoading(true)
+      if (this.formData.id != '') {
 
         let params = {
-          reuniao: reuniaoParams,
+          id: this.formData.id,
           data: {
             ano: this.dataDia.split('-')[0],
             mes: this.dataDia.split('-')[1]
           }
         }
 
-        if (this.formData.id == '') {
-          await this.criarReuniao(params)
-        } else {
-          await this.alterarReuniao(params)
-        }
+        await this.deletarReuniao(params)
 
-        this.loading = false
         this.salvar = true
-        // this.formData.id = ''
-        // this.formData.nome = ''
-        // this.formData.fim = null
-        // this.formData.inicio = null
-        // this.formData.sala = ''
-        // this.dataDia = ''
-        // this.open = false
-        // this.$emit('dadosEvento')
-
-      } catch (err) {
-        this.loading = false
-        this.error = true
-      }
-    },
-    async listarSala() {
-      // try {
-      //   this.loading = true
-      //   this.error = false
-      //   const response = await this.$http.get(
-      //     'sala/listar',
-      //     this.getRequestParams
-      //   )
-      //   let t = await response.json()
-      //   this.salas = t.salas
-      //   this.loading = false
-      //   // eslint-disable-next-line no-console
-      //   console.log(this.salas)
-      // } catch (err) {
-      //   this.loading = false
-      //   this.error = true
-      //   if (err.data != undefined) {
-      //     this.errorMessage = err.data.message.message
-      //   } else {
-      //     this.errorMessage = 'Houve um erro, tente novamente mais tarde'
-      //   }
-      // }
-    },
-    async deletar() {
-      if (this.formData.id != '') {
-        // eslint-disable-next-line no-console
-        console.log('entrei no deletar')
-        try {
-          this.loading = true
-
-          let params = {
-            id: this.formData.id,
-            data: {
-              ano: this.dataDia.split('-')[0],
-              mes: this.dataDia.split('-')[1]
-            }
-          }
-
-          await this.deletarReuniao(params)
-
-          // this.$emit('deletar')
-          // this.openChanged()
-          this.loading = false
-          this.loading = false
-          this.salvar = true
-        } catch (err) {
-          this.loading = false
-          this.error = true
-          if (err.data != undefined) {
-            this.errorMessage = err.data.message.message
-          } else {
-            this.errorMessage = 'Houve um erro, tente novamente mais tarde'
-          }
-        }
       }
     }
   }
