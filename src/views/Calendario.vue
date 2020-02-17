@@ -209,12 +209,6 @@ export default {
       this.open = false
       this.formEvento = {}
     },
-    criarEvento() {
-      // do nothing
-    },
-    deletarEvento(id) {
-      // do nothing
-    },
     getEventColor(event) {
       return event.color
     },
@@ -226,22 +220,6 @@ export default {
     },
     next() {
       this.$refs.calendar.next()
-    },
-    showEvent({ nativeEvent, event }) {
-      const open = () => {
-        this.selectedEvent = event
-        this.selectedElement = nativeEvent.target
-        setTimeout(() => (this.selectedOpen = true), 10)
-      }
-
-      if (this.selectedOpen) {
-        this.selectedOpen = false
-        setTimeout(open, 10)
-      } else {
-        open()
-      }
-
-      nativeEvent.stopPropagation()
     },
     updateRange({ start, end }) {
       this.start = start
@@ -257,15 +235,6 @@ export default {
         ? 'th'
         : ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][d % 10]
     },
-    rnd(a, b) {
-      return Math.floor((b - a + 1) * Math.random()) + a
-    },
-    formatDate(a, withTime) {
-      return withTime
-        ? `${a.getFullYear()}-${a.getMonth() +
-            1}-${a.getDate()} ${a.getHours()}:${a.getMinutes()}`
-        : `${a.getFullYear()}-${a.getMonth() + 1}-${a.getDate()}`
-    }
   }
 }
 </script>
