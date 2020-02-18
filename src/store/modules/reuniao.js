@@ -49,10 +49,11 @@ const mutations = {
       let reunioes = await api.listarReuniao(ano, mes)
       state.reunioes = reunioes.reunioes
       state.errorForm = 'OK'
-      state.loading = false
 
     } catch (error) {
       state.errorForm = error.toString().split(': ')[1]
+
+    } finally {
       state.loading = false
 
     }
@@ -72,9 +73,10 @@ const mutations = {
       let reunioes = await api.listarReuniao(ano, mes)
       state.reunioes = reunioes.reunioes
       state.errorForm = 'OK'
-      state.loading = false
     } catch (error) {
       state.errorForm = error.toString().split(': ')[1]
+
+    } finally {
       state.loading = false
 
     }
@@ -86,9 +88,10 @@ const mutations = {
       let reunioes = await api.listarReuniao(params.data.ano, params.data.mes)
       state.reunioes = reunioes.reunioes
       state.errorForm = 'OK'
-      state.loading = false
     } catch (error) {
       state.errorForm = error.toString().split(': ')[1]
+
+    } finally {
       state.loading = false
 
     }
@@ -110,9 +113,10 @@ const mutations = {
       let relatorio = await api.listarRelatorio(params.user, params.ano, params.mes)
       state.relatorio = await relatorio.reunioes
       state.error = ''
-      state.loading = false
     } catch (error) {
       state.error = error.toString().split(': ')[1]
+
+    } finally {
       state.loading = false
 
     }
@@ -123,6 +127,9 @@ const mutations = {
       state.salas = await salas.salas
     } catch (error) {
       state.error = error.toString().split(': ')[1]
+
+    } finally {
+      state.loading = false
 
     }
   },

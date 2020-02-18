@@ -2,7 +2,7 @@
   <v-row justify="center">
     <v-dialog v-model="open" max-width="600px">
       <v-form ref="form" v-model="form.valid">
-        <v-card color="grey lighten-4" min-width="350px" @close="openChanged">
+        <v-card color="grey lighten-4" min-width="350px">
           <v-toolbar color="blue">
             <v-toolbar-title>Reservar Sala</v-toolbar-title>
             <v-spacer />
@@ -149,7 +149,7 @@
             </v-container>
           </v-card-text>
           <v-card-actions>
-            <v-btn text color="secondary" :disabled="loading" @click="openChanged">Cancelar</v-btn>
+            <v-btn text color="secondary" :disabled="loading" @click="open = false">Cancelar</v-btn>
             <v-btn
               text
               color="blue darken-1"
@@ -192,7 +192,7 @@ export default {
         valid: false,
         rules: {
           ruleSelect: [v => !!v || 'Selecione um dos itens abaixo'],
-          ruleNotEmpty: [v => !!v || 'Campo não pode ser vazio']
+          ruleNotEmpty: [v => !!v || 'Campo não pode ser vazio'],
         }
       },
       menu2: false,
@@ -232,6 +232,13 @@ export default {
         this.openChanged()
       }
     },
+    open(){
+      if(this.open == false){
+        this.openChanged()
+        this.$refs.form.resetValidation()
+      }
+
+    },
     dataDia() {
       if (this.dataDia != '') {
         this.formData.dataI = this.dataDia
@@ -261,6 +268,7 @@ export default {
     this.salvar = false
     this.listarSalas()
     this.setErrorForm()
+    this.$refs.form.resetValidation()
   },
   methods: {
     ...mapActions(['criarReuniao', 'alterarReuniao', 'deletarReuniao', 'listarSalas', 'setErrorForm', 'setLoading']),

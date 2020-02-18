@@ -105,6 +105,8 @@ export default {
   },
   mounted() {
     this.setLoading(true)
+    let [year, month] = this.yearMonth()
+    this.date = this.normalize(year, month)
     this.user = this.getUser.username
     this.users.push({
       id: this.getUser.username,

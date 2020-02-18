@@ -164,7 +164,6 @@ export default {
     }
   },
   mounted() {
-    this.setLoading(true)
     this.$refs.calendar.checkChange()
   },
   methods: {
@@ -207,6 +206,7 @@ export default {
       this.$refs.calendar.next()
     },
     async updateRange({ start, end }) {
+      this.setLoading(true)
       this.start = start
       this.end = end
       let params = {
