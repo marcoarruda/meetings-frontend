@@ -52,6 +52,7 @@
           :now="today"
           :type="type"
           :loading="true"
+          @click:time="openFormCriarTime"
           @click:day="openFormCriar"
           @click:event="openFormEditar"
           @click:more="viewDay"
@@ -62,7 +63,7 @@
       </v-sheet>
 
       <!-- Form -->
-      <app-form :open="open" :data-dia="dataDia" :evento="formEvento" @closed="limparDados" />
+      <app-form :open="open" :data-dia="dataDia" :hora="hora" :evento="formEvento" @closed="limparDados" />
     </v-col>
   </v-row>
 </template>
@@ -78,6 +79,7 @@ export default {
   data: () => ({
     formEvento: { },
     dataDia: '',
+    hora: '',
     open: false,
     focus: '',
     today: new Date().toISOString().split('T')[0],
@@ -172,6 +174,14 @@ export default {
       this.focus = date
       this.type = 'day'
     },
+    openFormCriarTime({ date, hour }) {
+      this.dataDia = date
+      this.hora = hour
+      if(hour == 0){
+        this.hora = '0'
+      }
+      this.open = true
+    },
     openFormCriar({ date }) {
       this.dataDia = date
       this.open = true
@@ -190,6 +200,7 @@ export default {
     },
     limparDados() {
       this.dataDia = ''
+      this.hora = ''
       this.formEvento = {
         id: '',
         sala: '',
