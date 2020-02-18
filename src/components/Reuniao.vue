@@ -246,7 +246,12 @@ export default {
         this.formData.dataF = this.dataDia
       }
       if(this.hora != ''){
-        this.formData.inicio = this.hora < 10 ? '0'+this.hora+':'+'00':this.hora+':'+'00'
+        if(this.hora == '0'){
+          this.formData.inicio = '00:00'
+          this.hora = 0
+        }else{
+          this.formData.inicio = this.hora < 10 ? '0'+this.hora+':'+'00':this.hora+':'+'00'
+        }
         let fim = this.hora + 1
         if((this.hora+1) == 24){
           fim = 0

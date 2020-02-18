@@ -175,10 +175,11 @@ export default {
       this.type = 'day'
     },
     openFormCriarTime({ date, hour }) {
-      // eslint-disable-next-line no-console
-      console.log(date)
       this.dataDia = date
       this.hora = hour
+      if(hour == 0){
+        this.hora = '0'
+      }
       this.open = true
     },
     openFormCriar({ date }) {
@@ -199,6 +200,7 @@ export default {
     },
     limparDados() {
       this.dataDia = ''
+      this.hora = ''
       this.formEvento = {
         id: '',
         sala: '',
