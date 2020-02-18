@@ -7,12 +7,8 @@ export default {
     let reuniao = null
     try {
       let response = await Vue.http.post('reuniao/agendar',
-        params,
-        store.getters.getRequestParams
-      )
+        params)
       reuniao =  await response.json()
-      // eslint-disable-next-line no-console
-      console.log(reuniao)
       return reuniao
 
     } catch (error) {
@@ -28,12 +24,8 @@ export default {
     let reuniao = null
     try {
       let response = await Vue.http.put('reuniao/alterar',
-        params,
-        store.getters.getRequestParams
-      )
+        params)
       reuniao =  await response.json()
-      // eslint-disable-next-line no-console
-      console.log(reuniao)
       return reuniao
 
     } catch (error) {
@@ -47,12 +39,8 @@ export default {
   async deletarReuniao(id) {
     let reuniaoDeletada = null
     try {
-      let response = await Vue.http.delete(`reuniao/excluir/${id}`,
-        store.getters.getRequestParams
-      )
+      let response = await Vue.http.delete(`reuniao/excluir/${id}`)
       reuniaoDeletada =  await response.json()
-      // eslint-disable-next-line no-console
-      console.log(reuniaoDeletada)
       return reuniaoDeletada
 
     } catch (error) {
@@ -66,9 +54,7 @@ export default {
   async listarReuniao(ano, mes){
     let reunioes = []
     try {
-      let response = await Vue.http.get(`reuniao/listar/${ano}/${mes}`,
-        store.getters.getRequestParams
-      )
+      let response = await Vue.http.get(`reuniao/listar/${ano}/${mes}`)
       reunioes = await response.json()
       return reunioes
 
@@ -85,12 +71,8 @@ export default {
   async listarRelatorio(user, ano, mes){
     let relatorio = []
     try {
-      let response = await Vue.http.get(`reuniao/relatorio/${user}/${ano}/${mes}`,
-        store.getters.getRequestParams
-      )
+      let response = await Vue.http.get(`reuniao/relatorio/${user}/${ano}/${mes}`)
       relatorio = await response.json()
-      // eslint-disable-next-line no-console
-      console.log(relatorio)
 
       return relatorio
 
@@ -105,12 +87,8 @@ export default {
   async listarSalas(){
     let salas = []
     try {
-      let response = await Vue.http.get('sala/listar',
-        store.getters.getRequestParams
-      )
+      let response = await Vue.http.get('sala/listar')
       salas = await response.json()
-      // eslint-disable-next-line no-console
-      console.log(salas)
       return salas
 
     } catch (error) {

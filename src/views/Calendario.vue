@@ -2,7 +2,7 @@
 <template>
   <v-row class="fill-height">
     <v-col>
-      <!-- {{ teste }} -->
+      <!-- Menu superior -->
       <v-sheet height="64">
         <v-toolbar flat color="white">
           <v-btn outlined class="mr-4" color="grey darken-2" @click="setToday">Today</v-btn>
@@ -38,7 +38,10 @@
           </v-menu>
         </v-toolbar>
       </v-sheet>
+
+      <!-- Calendario -->
       <v-sheet height="600">
+        <v-progress-linear v-show="loading" indeterminate color="light-blue" />
         <v-alert v-show="erro != ''" dense outlined type="error">{{ erro }}</v-alert>
         <v-calendar
           ref="calendar"
@@ -48,6 +51,7 @@
           :event-color="getEventColor"
           :now="today"
           :type="type"
+          :loading="true"
           @click:day="openFormCriar"
           @click:event="openFormEditar"
           @click:more="viewDay"
@@ -55,13 +59,10 @@
           @change="updateRange"
         />
         <!-- eslint-disable-next-line vue/attribute-hyphenation -->
-        <app-form
-          :open="open"
-          :data-dia="dataDia"
-          :evento="evento"
-          @openChanged="limparDados()"
-        />
       </v-sheet>
+
+      <!-- Form -->
+      <app-form :open="open" :data-dia="dataDia" :evento="formEvento" @closed="limparDados" />
     </v-col>
   </v-row>
 </template>
@@ -75,12 +76,9 @@ export default {
     appForm: ReuniaoForm
   },
   data: () => ({
-    error: false,
-    errorMessage: '',
-    evento: '',
+    formEvento: { },
     dataDia: '',
     open: false,
-    teste: 'teste',
     focus: '',
     today: new Date().toISOString().split('T')[0],
     type: 'month',
@@ -92,10 +90,6 @@ export default {
     },
     start: null,
     end: null,
-    selectedEvent: {},
-    selectedElement: null,
-    selectedOpen: false,
-    // events: [],
     colors: [
       'blue',
       'indigo',
@@ -105,19 +99,14 @@ export default {
       'orange',
       'grey darken-1'
     ],
-    names: [
-      'Meeting',
-      'Holiday',
-      'PTO',
-      'Travel',
-      'Event',
-      'Birthday',
-      'Conference',
-      'Party'
-    ]
   }),
   computed: {
-    ...mapGetters(['getUser', 'getRequestParams', 'getReunioes', 'getError']),
+    ...mapGetters([
+      'getUser',
+      'getReunioes',
+      'getError',
+      'getLoading'
+    ]),
     title() {
       const { start, end } = this
       if (!start || !end) {
@@ -152,7 +141,7 @@ export default {
         month: 'long'
       })
     },
-    erro(){
+    erro() {
       return this.getError
     },
     events() {
@@ -165,21 +154,20 @@ export default {
           ' ' +
           r.inicio.split('T')[1].split(':00.000Z')[0],
         end:
-          r.fim.split('T')[0] +
-          ' ' +
-          r.fim.split('T')[1].split(':00.000Z')[0],
+          r.fim.split('T')[0] + ' ' + r.fim.split('T')[1].split(':00.000Z')[0],
         color:
-          this.getUser.username == r.UserId
-            ? this.colors[0]
-            : this.colors[6]
+          this.getUser.username == r.UserId ? this.colors[0] : this.colors[6]
       }))
+    },
+    loading() {
+      return this.getLoading
     }
   },
   mounted() {
     this.$refs.calendar.checkChange()
   },
   methods: {
-    ...mapActions(['listarReunioes']),
+    ...mapActions(['listarReunioes', 'setLoading']),
     viewDay({ date }) {
       this.focus = date
       this.type = 'day'
@@ -189,7 +177,7 @@ export default {
       this.open = true
     },
     openFormEditar({ event }) {
-      this.evento = {
+      this.formEvento = {
         id: event.id,
         sala: event.sala,
         dataI: event.start.split(' ')[0],
@@ -202,15 +190,16 @@ export default {
     },
     limparDados() {
       this.dataDia = ''
+      this.formEvento = {
+        id: '',
+        sala: '',
+        dataI: '',
+        dataF: '',
+        inicio: '',
+        fim: '',
+        nome: ''
+      }
       this.open = false
-      this.evento = ''
-      this.error = false
-    },
-    criarEvento() {
-      // do nothing
-    },
-    deletarEvento(id) {
-      // do nothing
     },
     getEventColor(event) {
       return event.color
@@ -224,48 +213,23 @@ export default {
     next() {
       this.$refs.calendar.next()
     },
-    showEvent({ nativeEvent, event }) {
-      const open = () => {
-        this.selectedEvent = event
-        this.selectedElement = nativeEvent.target
-        setTimeout(() => (this.selectedOpen = true), 10)
-      }
-
-      if (this.selectedOpen) {
-        this.selectedOpen = false
-        setTimeout(open, 10)
-      } else {
-        open()
-      }
-
-      nativeEvent.stopPropagation()
-    },
-    updateRange({ start, end }) {
+    async updateRange({ start, end }) {
+      this.setLoading(true)
       this.start = start
       this.end = end
       let params = {
         ano: this.start.year,
         mes: this.start.month
       }
-      this.listarReunioes(params)
+      await this.listarReunioes(params)
       // eslint-disable-next-line no-console
-      console.log('pos listarReunioes')
-      // this.listarReuniao()
+      console.log('apos listar')
     },
     nth(d) {
       return d > 3 && d < 21
         ? 'th'
         : ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][d % 10]
     },
-    rnd(a, b) {
-      return Math.floor((b - a + 1) * Math.random()) + a
-    },
-    formatDate(a, withTime) {
-      return withTime
-        ? `${a.getFullYear()}-${a.getMonth() +
-            1}-${a.getDate()} ${a.getHours()}:${a.getMinutes()}`
-        : `${a.getFullYear()}-${a.getMonth() + 1}-${a.getDate()}`
-    }
   }
 }
 </script>

@@ -5,41 +5,31 @@ const state = {
   reunioes: [],
   relatorio: [],
   salas: [],
-  error: null,
+  error: '',
   errorForm: null,
-  open: false,
+  loading: true,
 }
 
 const getters = {
   getReuniao(state){
     return state.reuniao
   },
-  getOpen(state){
-    return state.open
+  getLoading(state){
+    return state.loading
   },
   getError(state) {
-    // eslint-disable-next-line no-console
-    console.log('entrei getError')
     return state.error
   },
   getErrorForm(state) {
-    // eslint-disable-next-line no-console
-    console.log('entrei getError')
     return state.errorForm
   },
   getReunioes(state){
-    // eslint-disable-next-line no-console
-    console.log('entrei getReunioes')
     return state.reunioes
   },
   getRelatorio(state){
-    // eslint-disable-next-line no-console
-    console.log('entrei getRelatorio')
     return state.relatorio
   },
   getSalas(state){
-    // eslint-disable-next-line no-console
-    console.log('entrei getSalas')
     return state.salas
   }
 }
@@ -62,9 +52,9 @@ const mutations = {
 
     } catch (error) {
       state.errorForm = error.toString().split(': ')[1]
-      // eslint-disable-next-line no-console
-      console.log(state.error)
-      // throw new Error(error)
+
+    } finally {
+      state.loading = false
 
     }
   },
@@ -86,6 +76,9 @@ const mutations = {
     } catch (error) {
       state.errorForm = error.toString().split(': ')[1]
 
+    } finally {
+      state.loading = false
+
     }
   },
   async mDeletarReuniao(state, params){
@@ -98,6 +91,9 @@ const mutations = {
     } catch (error) {
       state.errorForm = error.toString().split(': ')[1]
 
+    } finally {
+      state.loading = false
+
     }
   },
   async mListarReunioes(state, params){
@@ -105,13 +101,11 @@ const mutations = {
       let reunioes = await api.listarReuniao(params.ano, params.mes)
       state.reunioes = await reunioes.reunioes
       state.error = ''
-      // eslint-disable-next-line no-console
-      // console.log(state.reunioes)
     } catch (error) {
       state.error = error.toString().split(': ')[1]
-      // eslint-disable-next-line no-console
-      console.log(error)
-
+    } finally {
+      state.loading = false
+      // chamar mSetLoading ?
     }
   },
   async mListarRelatorio(state, params){
@@ -119,9 +113,11 @@ const mutations = {
       let relatorio = await api.listarRelatorio(params.user, params.ano, params.mes)
       state.relatorio = await relatorio.reunioes
       state.error = ''
-
     } catch (error) {
       state.error = error.toString().split(': ')[1]
+
+    } finally {
+      state.loading = false
 
     }
   },
@@ -129,22 +125,22 @@ const mutations = {
     try {
       let salas = await api.listarSalas()
       state.salas = await salas.salas
-      // eslint-disable-next-line no-console
-      console.log(state.salas)
-
     } catch (error) {
       state.error = error.toString().split(': ')[1]
 
+    } finally {
+      state.loading = false
+
     }
+  },
+  mSetLoading(state, valor){
+    state.loading = valor
   },
   mSetError(state){
     state.error = ''
   },
   mSetErrorForm(state){
     state.errorForm = ''
-  },
-  mSetOpen(state, value){
-    state.open = value
   }
 }
 
@@ -167,14 +163,14 @@ const actions = {
   async listarSalas(context){
     await context.commit('mListarSalas')
   },
+  setLoading(context, valor){
+    context.commit('mSetLoading', valor)
+  },
   setError(context){
     context.commit('mSetError')
   },
-  setErrorForm(context){
-    context.commit('mSetErrorForm')
-  },
-  setOpen(context, value){
-    context.commit('mSetOpen', value)
+  setErrorForm(context, valor){
+    context.commit('mSetErrorForm', valor)
   }
 }
 
