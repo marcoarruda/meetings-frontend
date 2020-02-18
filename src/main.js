@@ -22,6 +22,9 @@ Vue.config.productionTip = false
 
 Vue.use(vueresource)
 
+Vue.http.options.root = 'https://9hes83by2l.execute-api.us-east-1.amazonaws.com/dev'
+Vue.http.headers.common['Content-Type'] = 'application/json'
+
 Vue.use(vuetify)
 
 const ignoreWarnMessage = 'The .native modifier for v-on is only valid on components but it was used on <div>.'

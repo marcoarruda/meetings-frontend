@@ -17,9 +17,9 @@
           :to="item.to"
           @click.prevent="item.click"
         >
-          <!-- <v-list-item-icon>
+          <v-list-item-icon>
             <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-icon> -->
+          </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title>{{ item.title }}</v-list-item-title>
           </v-list-item-content>
@@ -58,8 +58,8 @@ export default {
     const path = this.$route.path
     this.updatePageTitle(path)
     this.items = [
-      { title: 'Calendario', to: '/', click: () => false },
-      { title: 'Relatorio', to: '/relatorio', click: () => false },
+      { title: 'Calendario', icon: 'mdi-calendar', to: '/', click: () => false },
+      { title: 'Relatorio', icon: 'mdi-clipboard-text', to: '/relatorio', click: () => false },
       { title: 'Sair', icon: 'mdi-logout', to:false, click: this.actionUserLogout }
     ]
     this.updatePageTitle(path)

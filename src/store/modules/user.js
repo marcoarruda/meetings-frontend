@@ -34,6 +34,8 @@ const mutations = {
 
 const actions = {
   actionUserLogin: async (context, payload) => {
+    // eslint-disable-next-line no-console
+    console.log(payload.signInUserSession.idToken.jwtToken)
     context.commit('mutUserLogin', payload)
   },
   // actionUserLogout: (context, payload) => {
