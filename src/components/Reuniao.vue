@@ -1,6 +1,6 @@
 <template>
   <v-row justify="center">
-    <v-dialog v-model="open" max-width="600px">
+    <v-dialog v-model="open" max-width="600px" @click:outside="openChanged">
       <v-form ref="form" v-model="form.valid">
         <v-card color="grey lighten-4" min-width="350px">
           <v-toolbar color="blue">
@@ -149,7 +149,7 @@
             </v-container>
           </v-card-text>
           <v-card-actions>
-            <v-btn text color="secondary" :disabled="loading" @click="open = false">Cancelar</v-btn>
+            <v-btn text color="secondary" :disabled="loading" @click="openChanged">Cancelar</v-btn>
             <v-btn
               text
               color="blue darken-1"
@@ -232,14 +232,6 @@ export default {
         this.openChanged()
       }
     },
-    open(){
-      if(this.open == false){
-        this.openChanged()
-      }
-      if(this.$refs.form !== undefined){
-        this.$refs.form.resetValidation()
-      }
-    },
     dataDia() {
       if (this.dataDia != '') {
         this.formData.dataI = this.dataDia
@@ -258,6 +250,9 @@ export default {
           this.formData.dataF = new Date(new Date(this.dataDia).getTime()+(24*60*60*1000)).toISOString().split('T')[0]
         }
         this.formData.fim = fim < 10 ? '0'+fim+':'+'00':fim+':'+'00'
+      }
+      if(this.$refs.form !== undefined){
+        this.$refs.form.resetValidation()
       }
     },
     evento() {
@@ -289,6 +284,7 @@ export default {
     openChanged() {
       this.setErrorForm()
       this.salvar = false
+      this.open = false
       this.$emit('closed')
     },
     async dadosEvento() {
