@@ -62,7 +62,7 @@
       </v-sheet>
 
       <!-- Form -->
-      <app-form :open="open" :data-dia="dataDia" :evento="formEvento" @openChanged="limparDados()" />
+      <app-form :open="open" :data-dia="dataDia" :evento="formEvento" @closed="limparDados" />
     </v-col>
   </v-row>
 </template>
@@ -190,8 +190,16 @@ export default {
     },
     limparDados() {
       this.dataDia = ''
+      this.formEvento = {
+        id: '',
+        sala: '',
+        dataI: '',
+        dataF: '',
+        inicio: '',
+        fim: '',
+        nome: ''
+      }
       this.open = false
-      this.formEvento = {}
     },
     getEventColor(event) {
       return event.color

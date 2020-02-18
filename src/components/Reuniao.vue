@@ -236,7 +236,9 @@ export default {
       if(this.open == false){
         this.openChanged()
       }
-      this.$refs.form.resetValidation()
+      if(this.$refs.form !== undefined){
+        this.$refs.form.resetValidation()
+      }
     },
     dataDia() {
       if (this.dataDia != '') {
@@ -267,21 +269,13 @@ export default {
     this.salvar = false
     this.listarSalas()
     this.setErrorForm()
-    this.$refs.form.resetValidation()
   },
   methods: {
     ...mapActions(['criarReuniao', 'alterarReuniao', 'deletarReuniao', 'listarSalas', 'setErrorForm', 'setLoading']),
     openChanged() {
       this.setErrorForm()
       this.salvar = false
-      this.formData.id = ''
-      this.formData.nome = ''
-      this.formData.fim = null
-      this.formData.inicio = null
-      this.formData.sala = ''
-      this.dataDia = ''
-      this.open = false
-      this.$emit('openChanged', this.open)
+      this.$emit('closed')
     },
     async dadosEvento() {
       this.setLoading(true)

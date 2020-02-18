@@ -24,6 +24,10 @@ Vue.use(vueresource)
 
 Vue.http.options.root = 'https://9hes83by2l.execute-api.us-east-1.amazonaws.com/dev'
 Vue.http.headers.common['Content-Type'] = 'application/json'
+Vue.http.interceptors.push((request, next) => {
+  request.headers.set('Authorization', store.getters.getRequestParams.headers.Authorization)
+  next()
+})
 
 Vue.use(vuetify)
 
