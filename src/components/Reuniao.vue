@@ -235,9 +235,8 @@ export default {
     open(){
       if(this.open == false){
         this.openChanged()
-        this.$refs.form.resetValidation()
       }
-
+      this.$refs.form.resetValidation()
     },
     dataDia() {
       if (this.dataDia != '') {
