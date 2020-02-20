@@ -1,13 +1,18 @@
 import { Auth } from 'aws-amplify'
 import router from '../../router/index'
+import api from '../../api'
 
 const state = {
-  user: null
+  user: null,
+  users: []
 }
 
 const getters = {
   'getUser': state => {
     return state.user
+  },
+  'getUsers': state => {
+    return state.users
   },
   'getUserIsAuth': state => {
     return state.user != null
@@ -30,6 +35,18 @@ const mutations = {
     state.user = null
     router.push({path: '/login'})
   },
+  'mListarUsuarios': async (state) => {
+    try {
+      let users = await api.listarUsuarios()
+      state.users = await users.users
+    } catch (error) {
+      state.error = error.toString().split(': ')[1]
+
+    } finally {
+      state.loading = false
+
+    }
+  }
 }
 
 const actions = {
@@ -48,6 +65,9 @@ const actions = {
         context.commit('mutUserLogout', null)
       })
   },
+  listarUsuarios: async (context) => {
+    await context.commit('mListarUsuarios')
+  }
 }
 
 export default {

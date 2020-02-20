@@ -69,13 +69,13 @@ export default {
       ],
       menu: false,
       user: '',
-      users: [],
       date: new Date().getFullYear() + '-' + (new Date().getMonth() + 1)
     }
   },
   computed: {
     ...mapGetters({
       getUser: 'getUser',
+      getUsers: 'getUsers',
       getRequestParams: 'getRequestParams',
       reunioes: 'getRelatorio',
       salas: 'getSalas',
@@ -84,12 +84,24 @@ export default {
     }),
     itens() {
       return this.organizeTable()
+    },
+    users(){
+      return this.getUsers.map(e => ({
+        id: e.id,
+        nome: e.name
+      }))
     }
   },
   watch: {
     user() {
       this.setLoading(true)
-      this.organizeTable()
+      let [ano, mes] = this.date.split('-')
+      let params = {
+        user: this.user,
+        ano,
+        mes
+      }
+      this.listarRelatorio(params)
     },
     date() {
       this.setLoading(true)
@@ -100,18 +112,14 @@ export default {
         mes
       }
       this.listarRelatorio(params)
-      this.organizeTable()
     }
   },
   mounted() {
     this.setLoading(true)
+    this.user = this.getUser.username
+    this.listarUsuarios()
     let [year, month] = this.yearMonth()
     this.date = this.normalize(year, month)
-    this.user = this.getUser.username
-    this.users.push({
-      id: this.getUser.username,
-      nome: this.getUser.attributes.name
-    })
     this.listarSalas()
     let [ano, mes] = this.date.split('-')
     let params = {
@@ -119,11 +127,9 @@ export default {
       ano,
       mes
     }
-    this.listarRelatorio(params)
-    this.organizeTable()
   },
   methods: {
-    ...mapActions(['listarRelatorio', 'listarSalas', 'setLoading']),
+    ...mapActions(['listarRelatorio', 'listarSalas', 'setLoading', 'listarUsuarios']),
     organizeTable() {
       let itens = []
       for (let i = 0; i < this.salas.length; i++) {
@@ -131,7 +137,7 @@ export default {
         for (let j = 0; j < this.reunioes.length; j++) {
           if (
             this.salas[i].id == this.reunioes[j].SalaId &&
-            this.reunioes[i].UserId == this.getUser.username
+            this.reunioes[i].UserId == this.user
           ) {
             duracao += this.calculaTempo(
               this.reunioes[i].inicio,

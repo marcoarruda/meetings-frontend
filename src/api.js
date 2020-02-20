@@ -99,4 +99,20 @@ export default {
       throw new Error(erro)
     }
   },
+  async listarUsuarios(){
+    let pagina = 1
+    let users = []
+    try {
+      let response = await Vue.http.get(`usuario/listar/${pagina}`)
+      users = await response.json()
+      return users
+
+    } catch (error) {
+      let erro = 'Houve um erro, tente novamente mais tarde'
+      if(error.data != '' ){
+        erro = error.data.message.message
+      }
+      throw new Error(erro)
+    }
+  }
 }

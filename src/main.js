@@ -22,7 +22,8 @@ Vue.config.productionTip = false
 
 Vue.use(vueresource)
 
-Vue.http.options.root = 'https://9hes83by2l.execute-api.us-east-1.amazonaws.com/dev'
+// eslint-disable-next-line no-undef
+Vue.http.options.root = process.env.VUE_APP_API_ROOT_URL
 Vue.http.headers.common['Content-Type'] = 'application/json'
 Vue.http.interceptors.push((request, next) => {
   request.headers.set('Authorization', store.getters.getRequestParams.headers.Authorization)
