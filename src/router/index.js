@@ -3,6 +3,7 @@ import store from '../store/index'
 import VueRouter from 'vue-router'
 import Calendario from '../views/Calendario.vue'
 import Relatorio from '../views/Relatorio.vue'
+import Salas from '../views/Salas.vue'
 import Login from '../views/Login.vue'
 import Erro404 from '../views/Erro404.vue'
 
@@ -18,6 +19,11 @@ const routes = [
     path: '/relatorio',
     name: 'relatorio',
     component: Relatorio
+  },
+  {
+    path: '/salas',
+    name: 'salas',
+    component: Salas
   },
   {
     path: '/login',

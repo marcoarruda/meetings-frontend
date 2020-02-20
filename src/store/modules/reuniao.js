@@ -133,6 +133,57 @@ const mutations = {
 
     }
   },
+  async mAdicionarSala(state, params){
+    try {
+      // let salas = await api.adicionarSala(params.nome)
+      //state.salas = await salas.salas
+      state.salas.push({
+        id: params.id,
+        nome: params.nome
+      })
+    } catch (error) {
+      state.error = error.toString().split(': ')[1]
+
+    } finally {
+      state.loading = false
+
+    }
+  },
+  async mAlterarSala(state, params){
+    try {
+      // let salas = await api.alterarSala(params.id, params.nome)
+      //state.salas = await salas.salas
+      let index = state.salas.map(e => {
+        return e.id
+      }).indexOf('')
+
+      state.salas[index].nome = params.nome
+
+    } catch (error) {
+      state.error = error.toString().split(': ')[1]
+
+    } finally {
+      state.loading = false
+
+    }
+  },
+  async mExcluirSala(state, params){
+    try {
+      // let salas = await api.excluirSala(params.id)
+      //state.salas = await salas.salas
+
+      state.salas = state.salas.filter(e => {
+        return e.id != params
+      })
+
+    } catch (error) {
+      state.error = error.toString().split(': ')[1]
+
+    } finally {
+      state.loading = false
+
+    }
+  },
   mSetLoading(state, valor){
     state.loading = valor
   },
@@ -162,6 +213,15 @@ const actions = {
   },
   async listarSalas(context){
     await context.commit('mListarSalas')
+  },
+  async adicionarSala(context, params){
+    await context.commit('mAdicionarSala', params)
+  },
+  async alterarSala(context, params){
+    await context.commit('mAlterarSala', params)
+  },
+  async excluirSala(context, params){
+    await context.commit('mExcluirSala', params)
   },
   setLoading(context, valor){
     context.commit('mSetLoading', valor)
