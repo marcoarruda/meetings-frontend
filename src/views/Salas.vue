@@ -1,66 +1,69 @@
 <template>
-  <v-card
-    max-width="500"
-    class="mx-auto"
-  >
-    <v-toolbar>
+  <v-form v-model="form.valid">
+    <v-card
+      max-width="500"
+      class="mx-auto"
+    >
+      <v-toolbar>
 
-      <v-toolbar-title>Salas</v-toolbar-title>
+        <v-toolbar-title>Salas</v-toolbar-title>
 
-      <v-spacer />
+        <v-spacer />
 
-      <v-btn icon :disabled="disabled" @click="addSala">
-        <v-icon>mdi-plus</v-icon>
-      </v-btn>
-    </v-toolbar>
-    <v-list>
-      <v-list-item
-        v-for="item in salas"
-        :key="item.nome"
-      >
-        <template v-if="item.id === ''">
-          <v-list-item-content>
-            <v-text-field
-              v-model="nome"
-              label="Nome da Sala"
-            />
-          </v-list-item-content>
+        <v-btn icon :disabled="disabled" @click="addSala">
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
+      </v-toolbar>
+      <v-list>
+        <v-list-item
+          v-for="item in salas"
+          :key="item.nome"
+        >
+          <template v-if="item.id == ''">
+            <v-list-item-content>
+              <v-text-field
+                v-model="nome"
+                label="Nome da Sala"
+                :rules="form.rules.ruleLength"
+              />
+            </v-list-item-content>
 
-          <v-list-item-icon @click="confirmar">
-            <v-btn icon>
-              <v-icon> mdi-check</v-icon>
-            </v-btn>
-          </v-list-item-icon>
+            <v-list-item-icon>
+              <v-btn icon :disabled="!form.valid" @click="confirmar">
+                <v-icon> mdi-check</v-icon>
+              </v-btn>
+            </v-list-item-icon>
 
-          <v-list-item-icon @click="cancelar">
-            <v-btn icon>
-              <v-icon> mdi-cancel</v-icon>
-            </v-btn>
-          </v-list-item-icon>
-        </template>
+            <v-list-item-icon>
+              <v-btn icon @click="cancelar">
+                <v-icon> mdi-cancel</v-icon>
+              </v-btn>
+            </v-list-item-icon>
+          </template>
 
-        <template v-else>
-          <v-list-item-content>
-            <v-list-item-title v-text="item.nome" />
-          </v-list-item-content>
+          <template v-else>
+            <v-list-item-content>
+              <v-list-item-title v-text="item.nome" />
+            </v-list-item-content>
 
-          <v-list-item-icon>
-            <v-btn icon :disabled="disabled" @click="editarSala(item.id)">
-              <v-icon> mdi-pencil</v-icon>
-            </v-btn>
-          </v-list-item-icon>
+            <v-list-item-icon>
+              <v-btn icon :disabled="disabled" @click="editarSala(item.id)">
+                <v-icon> mdi-pencil</v-icon>
+              </v-btn>
+            </v-list-item-icon>
 
-          <v-list-item-icon>
-            <v-btn icon :disabled="disabled" @click="removerSala(item.id)">
-              <v-icon> mdi-delete</v-icon>
-            </v-btn>
-          </v-list-item-icon>
+            <v-list-item-icon>
+              <v-btn icon :disabled="disabled" @click="removerSala(item.id)">
+                <v-icon> mdi-delete</v-icon>
+              </v-btn>
+            </v-list-item-icon>
 
-        </template>
+          </template>
 
-      </v-list-item>
-    </v-list>
-  </v-card>
+        </v-list-item>
+      </v-list>
+    </v-card>
+  </v-form>
 </template>
 <script>
 import { mapGetters, mapActions } from 'vuex'
@@ -71,6 +74,12 @@ export default {
       disabled: false,
       nome: '',
       id: '',
+      form: {
+        valid: false,
+        rules: {
+          ruleLength: [v => v.length > 3 || 'Nome deve ter no minimo 4 caracteres']
+        }
+      }
     }
   },
   computed: {
