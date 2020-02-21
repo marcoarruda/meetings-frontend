@@ -102,7 +102,7 @@ export default {
     open: false,
     focus: '',
     today: new Date().toISOString().split('T')[0],
-    type: 'month',
+    type: 'week',
     typeToLabel: {
       month: 'Mês',
       week: 'Semana',
