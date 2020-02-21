@@ -2,7 +2,7 @@
   <div>
     <v-alert v-show="erro != '' " dense outlined type="error">{{ erro }}</v-alert>
     <v-row>
-      <v-col cols="8" sm="8" md="3" lg="2" xl="4" align="center">
+      <v-col cols="12" sm="3" md="3" lg="2" xl="4" align="center">
         <v-select
           v-model="user"
           :items="users"
@@ -18,7 +18,7 @@
           <v-icon>mdi-arrow-left</v-icon>
         </button>
       </v-col>
-      <v-col cols="8" sm="8" md="3" lg="2" xl="4" align="center">
+      <v-col cols="8" sm="3" md="3" lg="2" xl="4" align="center">
         <v-menu
           ref="menu"
           v-model="menu"

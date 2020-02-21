@@ -5,37 +5,55 @@
       <!-- Menu superior -->
       <v-sheet height="64">
         <v-toolbar flat color="white">
-          <v-btn outlined class="mr-4" color="grey darken-2" @click="setToday">Today</v-btn>
-          <v-btn fab text small color="grey darken-2" @click="prev">
-            <v-icon small>mdi-chevron-left</v-icon>
-          </v-btn>
-          <v-btn fab text small color="grey darken-2" @click="next">
-            <v-icon small>mdi-chevron-right</v-icon>
-          </v-btn>
-          <v-toolbar-title>{{ title }}</v-toolbar-title>
-          <v-spacer />
-          <v-menu bottom right>
-            <template v-slot:activator="{ on }">
-              <v-btn outlined color="grey darken-2" v-on="on">
-                <span>{{ typeToLabel[type] }}</span>
-                <v-icon right>mdi-menu-down</v-icon>
-              </v-btn>
-            </template>
-            <v-list>
-              <v-list-item @click="type = 'day'">
-                <v-list-item-title>Day</v-list-item-title>
-              </v-list-item>
-              <v-list-item @click="type = 'week'">
-                <v-list-item-title>Week</v-list-item-title>
-              </v-list-item>
-              <v-list-item @click="type = 'month'">
-                <v-list-item-title>Month</v-list-item-title>
-              </v-list-item>
-              <v-list-item @click="type = '4day'">
-                <v-list-item-title>4 days</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
+          <v-container>
+            <v-row>
+              <v-col cols="6" sm="2" md="1" lg="1" xl="1" align="right" order="1" order-lg="1" order-sm="1">
+                <v-btn outlined class="mr-4" color="grey darken-2" @click="setToday">Hoje</v-btn>
+
+              </v-col>
+              <v-col cols="2" align="center" order="3" order-lg="2" order-sm="2">
+                <v-btn fab text small color="grey darken-2" @click="prev">
+                  <v-icon small>mdi-chevron-left</v-icon>
+                </v-btn>
+              </v-col>
+              <v-col cols="7" sm="3" md="3" lg="2" xl="4" align="center" order="4" order-lg="3" order-sm="3">
+                <v-toolbar-title>{{ title }}</v-toolbar-title>
+              </v-col>
+              <v-col cols="2" align="center" order="5" order-lg="4" order-sm="4">
+                <v-btn fab text small color="grey darken-2" @click="next">
+                  <v-icon small>mdi-chevron-right</v-icon>
+                </v-btn>
+
+              </v-col>
+              <v-col cols="6" sm="2" md="1" lg="1" xl="1" align="left" order="2" order-lg="5" order-sm="5">
+                <v-menu bottom right>
+                  <template v-slot:activator="{ on }">
+                    <v-btn outlined color="grey darken-2" v-on="on">
+                      <span>{{ typeToLabel[type] }}</span>
+                      <v-icon right>mdi-menu-down</v-icon>
+                    </v-btn>
+                  </template>
+                  <v-list>
+                    <v-list-item @click="type = 'day'">
+                      <v-list-item-title>Dia</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item @click="type = 'week'">
+                      <v-list-item-title>Semana</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item @click="type = 'month'">
+                      <v-list-item-title>Mês</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item @click="type = '4day'">
+                      <v-list-item-title>4 dias</v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+
+              </v-col>
+
+            </v-row>
+
+          </v-container>
         </v-toolbar>
       </v-sheet>
 
@@ -47,6 +65,7 @@
           ref="calendar"
           v-model="focus"
           color="primary"
+          locale="pt"
           :events="events"
           :event-color="getEventColor"
           :now="today"
@@ -85,10 +104,10 @@ export default {
     today: new Date().toISOString().split('T')[0],
     type: 'month',
     typeToLabel: {
-      month: 'Month',
-      week: 'Week',
-      day: 'Day',
-      '4day': '4 Days'
+      month: 'Mês',
+      week: 'Semana',
+      day: 'Dia',
+      '4day': '4 dias'
     },
     start: null,
     end: null,
