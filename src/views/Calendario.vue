@@ -3,8 +3,8 @@
   <v-row class="fill-height">
     <v-col>
       <!-- Menu superior -->
-      <v-sheet height="64">
-        <v-toolbar flat color="white">
+      <v-sheet height="100">
+        <v-toolbar flat color="white" height="100">
           <v-container>
             <v-row>
               <v-col cols="6" sm="2" md="1" lg="1" xl="1" align="right" order="1" order-lg="1" order-sm="1">
@@ -56,7 +56,6 @@
           </v-container>
         </v-toolbar>
       </v-sheet>
-
       <!-- Calendario -->
       <v-sheet height="600">
         <v-progress-linear v-show="loading" indeterminate color="light-blue" />
