@@ -233,26 +233,28 @@ export default {
       }
     },
     dataDia() {
-      if (this.dataDia != '') {
-        this.formData.dataI = this.dataDia
-        this.formData.dataF = this.dataDia
-      }
-      if(this.hora != ''){
-        if(this.hora == '0'){
-          this.formData.inicio = '00:00'
-          this.hora = 0
-        }else{
-          this.formData.inicio = this.hora < 10 ? '0'+this.hora+':'+'00':this.hora+':'+'00'
+      if(this.evento.id == ''){
+        if (this.dataDia != '') {
+          this.formData.dataI = this.dataDia
+          this.formData.dataF = this.dataDia
         }
-        let fim = this.hora + 1
-        if((this.hora+1) == 24){
-          fim = 0
-          this.formData.dataF = new Date(new Date(this.dataDia).getTime()+(24*60*60*1000)).toISOString().split('T')[0]
+        if(this.hora != ''){
+          if(this.hora == '0'){
+            this.formData.inicio = '00:00'
+            this.hora = 0
+          }else{
+            this.formData.inicio = this.hora < 10 ? '0'+this.hora+':'+'00':this.hora+':'+'00'
+          }
+          let fim = this.hora + 1
+          if((this.hora+1) == 24){
+            fim = 0
+            this.formData.dataF = new Date(new Date(this.dataDia).getTime()+(24*60*60*1000)).toISOString().split('T')[0]
+          }
+          this.formData.fim = fim < 10 ? '0'+fim+':'+'00':fim+':'+'00'
         }
-        this.formData.fim = fim < 10 ? '0'+fim+':'+'00':fim+':'+'00'
-      }
-      if(this.$refs.form !== undefined){
-        this.$refs.form.resetValidation()
+        if(this.$refs.form !== undefined){
+          this.$refs.form.resetValidation()
+        }
       }
     },
     evento() {
@@ -312,9 +314,6 @@ export default {
       }
 
       this.salvar = true
-    },
-    async listarSala() {
-
     },
     async deletar() {
       this.setLoading(true)

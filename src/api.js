@@ -99,6 +99,51 @@ export default {
       throw new Error(erro)
     }
   },
+  async adicionarSala(params){
+    let sala = []
+    try {
+      let response = await Vue.http.post('sala/adicionar', params)
+      sala = await response.json()
+      return sala
+
+    } catch (error) {
+      let erro = 'Houve um erro, tente novamente mais tarde'
+      if(error.data != '' ){
+        erro = error.data.message.message
+      }
+      throw new Error(erro)
+    }
+  },
+  async alterarSala(params){
+    let sala = []
+    try {
+      let response = await Vue.http.put('sala/alterar', params)
+      sala = await response.json()
+      return sala
+
+    } catch (error) {
+      let erro = 'Houve um erro, tente novamente mais tarde'
+      if(error.data != '' ){
+        erro = error.data.message.message
+      }
+      throw new Error(erro)
+    }
+  },
+  async excluirSala(id){
+    let sala = []
+    try {
+      let response = await Vue.http.delete('sala/excluir', id)
+      sala = await response.json()
+      return sala
+
+    } catch (error) {
+      let erro = 'Houve um erro, tente novamente mais tarde'
+      if(error.data != '' ){
+        erro = error.data.message.message
+      }
+      throw new Error(erro)
+    }
+  },
   async listarUsuarios(){
     let pagina = 1
     let users = []

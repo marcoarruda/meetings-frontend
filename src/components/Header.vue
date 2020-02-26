@@ -60,6 +60,7 @@ export default {
     this.items = [
       { title: 'Calendario', icon: 'mdi-calendar', to: '/', click: () => false },
       { title: 'Relatorio', icon: 'mdi-clipboard-text', to: '/relatorio', click: () => false },
+      { title: 'Gerenciar Salas', icon: 'mdi-border-all', to: '/salas', click: () => false },
       { title: 'Sair', icon: 'mdi-logout', to:false, click: this.actionUserLogout }
     ]
     this.updatePageTitle(path)
